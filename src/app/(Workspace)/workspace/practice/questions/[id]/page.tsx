@@ -35,10 +35,9 @@ const getQuestionNumber = (id: string): number => {
 export default async function QuestionPage({
   params,
 }: {
-  params: { id: string }
+  params: Promise<{ id: string }>
 }) {
-
-  const id = (await params).id
+  const { id } = await params
   const supabase = await createClient()
 
   const { data: question, error } = await supabase
