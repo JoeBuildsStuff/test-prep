@@ -2,20 +2,13 @@
 
 import * as React from "react"
 import {
-  AudioWaveform,
   BookOpen,
-  Bot,
-  Command,
-  Frame,
-  GalleryVerticalEnd,
-  Map,
   PieChart,
   Settings2,
   SquareTerminal,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
-import { NavProjects } from "@/components/nav-projects"
 import { NavUser } from "@/components/nav-user"
 import { TeamSwitcher } from "@/components/team-switcher"
 import {
@@ -27,6 +20,7 @@ import {
 } from "@/components/ui/sidebar"
 
 import { User } from '@supabase/supabase-js'
+import { usePathname } from 'next/navigation'
 
 // Add interface for the user data
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
@@ -37,128 +31,104 @@ interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
 const data = {
   teams: [
     {
-      name: "Acme Inc",
-      logo: GalleryVerticalEnd,
+      name: "Test Prep Pro",
+      logo: BookOpen,
       plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
     },
   ],
   navMain: [
     {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminal,
+      title: "Dashboard",
+      url: "/workspace/dashboard",
+      icon: PieChart,
       isActive: true,
       items: [
         {
-          title: "History",
-          url: "#",
+          title: "Overview",
+          url: "/workspace/dashboard",
         },
         {
-          title: "Starred",
-          url: "#",
+          title: "Progress",
+          url: "/workspace/dashboard/progress",
         },
         {
-          title: "Settings",
-          url: "#",
+          title: "Analytics",
+          url: "/workspace/dashboard/analytics",
         },
       ],
     },
     {
-      title: "Models",
-      url: "#",
-      icon: Bot,
+      title: "Practice",
+      url: "/workspace/practice",
+      icon: SquareTerminal,
       items: [
         {
-          title: "Genesis",
-          url: "#",
+          title: "Question Bank",
+          url: "/workspace/practice/questions",
         },
         {
-          title: "Explorer",
-          url: "#",
+          title: "Mock Tests",
+          url: "/workspace/practice/tests",
         },
         {
-          title: "Quantum",
-          url: "#",
+          title: "Flash Cards",
+          url: "/workspace/practice/flashcards",
         },
       ],
     },
     {
-      title: "Documentation",
-      url: "#",
+      title: "Study Material",
+      url: "/workspace/study",
       icon: BookOpen,
       items: [
         {
-          title: "Introduction",
-          url: "#",
+          title: "By Section",
+          url: "/workspace/study/sections",
         },
         {
-          title: "Get Started",
-          url: "#",
+          title: "By Difficulty",
+          url: "/workspace/study/difficulty",
         },
         {
-          title: "Tutorials",
-          url: "#",
-        },
-        {
-          title: "Changelog",
-          url: "#",
+          title: "Bookmarked",
+          url: "/workspace/study/bookmarked",
         },
       ],
     },
     {
       title: "Settings",
-      url: "#",
+      url: "/workspace/settings",
       icon: Settings2,
       items: [
         {
-          title: "General",
-          url: "#",
+          title: "Profile",
+          url: "/workspace/settings/profile",
         },
         {
-          title: "Team",
-          url: "#",
+          title: "Preferences",
+          url: "/workspace/settings/preferences",
         },
         {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
+          title: "Subscription",
+          url: "/workspace/settings/subscription",
         },
       ],
-    },
-  ],
-  projects: [
-    {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
-    },
-    {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
     },
   ],
 }
 
 export function AppSidebar({ userData, ...props }: AppSidebarProps) {
+  const pathname = usePathname()
+
+  // Update the data object with active states based on pathname
+  const navMainWithActive = data.navMain.map(item => ({
+    ...item,
+    isActive: pathname.startsWith(item.url),
+    items: item.items?.map(subItem => ({
+      ...subItem,
+      isActive: pathname === subItem.url
+    }))
+  }))
   const user = {
     name: userData.email?.split('@')[0] || 'User',
     email: userData.email || '',
@@ -171,8 +141,7 @@ export function AppSidebar({ userData, ...props }: AppSidebarProps) {
         <TeamSwitcher teams={data.teams} />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
+        <NavMain items={navMainWithActive} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={user} />
