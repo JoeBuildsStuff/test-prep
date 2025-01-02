@@ -24,10 +24,9 @@ interface Question {
   updated_at: string;
 }
 
-interface QuestionPageProps {
-  params: {
-    id: string
-  }
+type Props = {
+  params: { id: string }
+  searchParams: { [key: string]: string | string[] | undefined }
 }
 
 const formatQuestionId = (num: number): string => {
@@ -38,7 +37,7 @@ const getQuestionNumber = (id: string): number => {
   return parseInt(id.replace('Q', ''))
 }
 
-export default async function QuestionPage({ params }: QuestionPageProps) {
+export default async function QuestionPage({ params }: Props) {
   const supabase = await createClient()
 
   const { data: question, error } = await supabase
