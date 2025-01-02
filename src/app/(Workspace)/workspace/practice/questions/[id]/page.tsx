@@ -24,11 +24,6 @@ interface Question {
   updated_at: string;
 }
 
-type Props = {
-  params: { id: string }
-  searchParams: { [key: string]: string | string[] | undefined }
-}
-
 const formatQuestionId = (num: number): string => {
   return `Q${num.toString().padStart(3, '0')}`
 }
@@ -37,7 +32,11 @@ const getQuestionNumber = (id: string): number => {
   return parseInt(id.replace('Q', ''))
 }
 
-export default async function QuestionPage({ params }: Props) {
+export default async function QuestionPage({
+  params,
+}: {
+  params: { id: string }
+}) {
   const supabase = await createClient()
 
   const { data: question, error } = await supabase
@@ -62,30 +61,30 @@ export default async function QuestionPage({ params }: Props) {
 
   return (
     <div className="space-y-6 max-w-3xl mx-auto">
-                <div className="flex items-center justify-between">
-          <Link href={prevId ? `/workspace/practice/questions/${prevId}` : '#'}>
-            <Button 
-              variant="outline" 
-              size="sm"
-              disabled={!prevId}
-            >
-              <ChevronLeft className="h-4 w-4 mr-1" />
-              Previous
-            </Button>
-          </Link>
-          <Link href={nextExists ? `/workspace/practice/questions/${nextId}` : '#'}>
-            <Button 
-              variant="outline" 
-              size="sm"
-              disabled={!nextExists}
-            >
-              Next
-              <ChevronRight className="h-4 w-4 ml-1" />
-            </Button>
-          </Link>
-        </div>
       <div className="flex items-center justify-between">
+        <Link href={prevId ? `/workspace/practice/questions/${prevId}` : '#'}>
+          <Button 
+            variant="outline" 
+            size="sm"
+            disabled={!prevId}
+          >
+            <ChevronLeft className="h-4 w-4 mr-1" />
+            Previous
+          </Button>
+        </Link>
+        <Link href={nextExists ? `/workspace/practice/questions/${nextId}` : '#'}>
+          <Button 
+            variant="outline" 
+            size="sm"
+            disabled={!nextExists}
+          >
+            Next
+            <ChevronRight className="h-4 w-4 ml-1" />
+          </Button>
+        </Link>
+      </div>
 
+      <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Question #{question.id}</h1>
         <div className="flex items-center gap-2">
           {question.difficulty && (
@@ -103,32 +102,30 @@ export default async function QuestionPage({ params }: Props) {
         </div>
       </div>
 
-      
-
       <QuestionAttempt question={question} />
 
       <div className="flex items-center justify-between">
-          <Link href={prevId ? `/workspace/practice/questions/${prevId}` : '#'}>
-            <Button 
-              variant="outline" 
-              size="sm"
-              disabled={!prevId}
-            >
-              <ChevronLeft className="h-4 w-4 mr-1" />
-              Previous
-            </Button>
-          </Link>
-          <Link href={nextExists ? `/workspace/practice/questions/${nextId}` : '#'}>
-            <Button 
-              variant="outline" 
-              size="sm"
-              disabled={!nextExists}
-            >
-              Next
-              <ChevronRight className="h-4 w-4 ml-1" />
-            </Button>
-          </Link>
-        </div>
+        <Link href={prevId ? `/workspace/practice/questions/${prevId}` : '#'}>
+          <Button 
+            variant="outline" 
+            size="sm"
+            disabled={!prevId}
+          >
+            <ChevronLeft className="h-4 w-4 mr-1" />
+            Previous
+          </Button>
+        </Link>
+        <Link href={nextExists ? `/workspace/practice/questions/${nextId}` : '#'}>
+          <Button 
+            variant="outline" 
+            size="sm"
+            disabled={!nextExists}
+          >
+            Next
+            <ChevronRight className="h-4 w-4 ml-1" />
+          </Button>
+        </Link>
+      </div>
     </div>
   )
 }
