@@ -10,5 +10,5 @@ export default async function RootPage() {
     redirect('/login')
   }
   
-  redirect('/workspace')
+  redirect('/workspace/practice/questions/Q001')
 }

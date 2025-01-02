@@ -23,6 +23,8 @@ interface TestQuestionRelation {
 export default async function TestPage({ params }: { params: { id: string } }) {
     const supabase = await createClient()
 
+    const testId = (await params).id
+
     // Fetch test and its questions
     const { data: test, error: testError } = await supabase
         .from('test_prep_tests')
@@ -43,7 +45,7 @@ export default async function TestPage({ params }: { params: { id: string } }) {
                 )
             )
         `)
-        .eq('id', params.id)
+        .eq('id', testId)
         .single()
 
     if (testError || !test) {

@@ -37,19 +37,21 @@ export default async function QuestionPage({
 }: {
   params: { id: string }
 }) {
+
+  const id = (await params).id
   const supabase = await createClient()
 
   const { data: question, error } = await supabase
     .from('test_prep_questions')
     .select('*')
-    .eq('id', params.id)
+    .eq('id', id)
     .single<Question>()
 
   if (error || !question) {
     notFound()
   }
 
-  const currentNum = getQuestionNumber(params.id)
+  const currentNum = getQuestionNumber(id)
   const prevId = currentNum > 1 ? formatQuestionId(currentNum - 1) : null
   const nextId = formatQuestionId(currentNum + 1)
 
