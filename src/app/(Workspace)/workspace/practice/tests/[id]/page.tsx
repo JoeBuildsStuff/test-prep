@@ -70,8 +70,6 @@ export default async function TestPage({
         return notFound()
     }
 
-    console.log(test)
-
     // Sort questions by order
     const questions = test.test_prep_test_questions
         .sort((a, b) => a.order - b.order)

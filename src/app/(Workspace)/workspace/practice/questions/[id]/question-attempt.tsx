@@ -45,7 +45,13 @@ export function QuestionAttempt({ question, testId, previousResponse }: Question
 
     let correct = false
     if (question.type === 'SINGLE_CHOICE') {
-      correct = selectedAnswer.toUpperCase() === question.correctanswer
+      // Parse the correctanswer if it's in array format
+      // TODO: This is a temporary fix to handle the array format
+      const correctAnswer = Array.isArray(question.correctanswer) 
+        ? question.correctanswer[0] 
+        : question.correctanswer.replace(/[\[\]'"]/g, '') // Remove brackets and quotes if present
+
+      correct = selectedAnswer.toUpperCase() === correctAnswer
     } else if (question.type === 'MULTIPLE_CHOICE') {
       const selectedAnswers = selectedAnswer.split(',').map(a => a.trim().toUpperCase()).sort()
       const correctAnswers = question.correctanswer.split(',').map(a => a.trim().toUpperCase()).sort()
