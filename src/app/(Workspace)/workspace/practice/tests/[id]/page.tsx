@@ -44,28 +44,33 @@ export default async function TestPage({
     const { id } = await params
 
     const { data: test, error: testError } = await supabase
-        .from('test_prep_tests')
-        .select(`
-            id,
-            score,
-            test_prep_test_questions(
-                order, 
-                question_id, 
-                test_prep_questions(*,
-                    test_prep_user_responses(
-                        selected_answers, 
-                        is_correct
-                    )
+    .from('test_prep_tests')
+    .select(`
+        id,
+        score,
+        test_prep_test_questions(
+            order, 
+            question_id, 
+            test_prep_questions(
+                *,
+                test_prep_user_responses(
+                    selected_answers, 
+                    is_correct
                 )
             )
-        `)
-        .eq('id', id)
-        .single() as { data: Test | null, error: PostgrestError | null }
+        )
+    `)
+    .eq('id', id)
+    .eq('test_prep_test_questions.test_prep_questions.test_prep_user_responses.test_id', id)  // Updated filter path
+    .single() as { data: Test | null, error: PostgrestError | null }
+
 
     if (testError || !test) {
         console.error('Error fetching test:', testError)
         return notFound()
     }
+
+    console.log(test)
 
     // Sort questions by order
     const questions = test.test_prep_test_questions
