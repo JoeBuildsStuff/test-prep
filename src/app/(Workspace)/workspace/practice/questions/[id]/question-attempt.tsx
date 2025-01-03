@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardDescription, CardFooter } from "@/co
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { CheckCircle2, XCircle } from "lucide-react"
+import { useRouter } from "next/navigation"
 
 import { createClient } from '@/utils/supabase/client'
 
@@ -20,14 +21,21 @@ interface QuestionAttemptProps {
     subsection: string | null
   }
   testId?: string
+  previousResponse?: {
+    selected_answers: string[]
+    is_correct: boolean
+  }
 }
 
-export function QuestionAttempt({ question, testId }: QuestionAttemptProps) {
+export function QuestionAttempt({ question, testId, previousResponse }: QuestionAttemptProps) {
   const supabase = createClient()
+  const router = useRouter()
 
-  const [selectedAnswer, setSelectedAnswer] = useState<string>('')
-  const [isSubmitted, setIsSubmitted] = useState(false)
-  const [isCorrect, setIsCorrect] = useState(false)
+  const [selectedAnswer, setSelectedAnswer] = useState<string>(
+    previousResponse?.selected_answers[0] || ''
+  )
+  const [isSubmitted, setIsSubmitted] = useState(!!previousResponse)
+  const [isCorrect, setIsCorrect] = useState(previousResponse?.is_correct || false)
   const [attemptError, setAttemptError] = useState<string | null>(null)
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -68,8 +76,20 @@ export function QuestionAttempt({ question, testId }: QuestionAttemptProps) {
 
       if (error) throw error
 
+      // After successful response insertion, update the test score
+      if (testId) {
+        const { error: scoreError } = await supabase
+          .rpc('update_test_score', { test_id_param: testId })
+
+        if (scoreError) throw scoreError
+        //refresh this page
+        router.refresh()
+      }
+
       setIsCorrect(correct)
       setIsSubmitted(true)
+
+
     } catch (error) {
       console.error('Error saving response:', error)
       setAttemptError('Failed to save your response. Please try again.')
