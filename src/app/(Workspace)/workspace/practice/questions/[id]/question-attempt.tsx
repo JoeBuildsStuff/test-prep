@@ -31,8 +31,8 @@ export function QuestionAttempt({ question, testId, previousResponse }: Question
   const supabase = createClient()
   const router = useRouter()
 
-  const [selectedAnswer, setSelectedAnswer] = useState<string>(
-    previousResponse?.selected_answers[0] || ''
+  const [selectedAnswer, setSelectedAnswer] = useState<string[]>(
+    previousResponse?.selected_answers || []
   )
   const [isSubmitted, setIsSubmitted] = useState(!!previousResponse)
   const [isCorrect, setIsCorrect] = useState(previousResponse?.is_correct || false)
@@ -40,22 +40,30 @@ export function QuestionAttempt({ question, testId, previousResponse }: Question
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!selectedAnswer) return
+    if (selectedAnswer.length === 0) return
     setAttemptError(null)
 
     let correct = false
-    if (question.type === 'SINGLE_CHOICE') {
-      // Parse the correctanswer if it's in array format
-      // TODO: This is a temporary fix to handle the array format
+    if (question.type === 'MULTIPLE_CHOICE') {
+      // Normalize both arrays: convert to uppercase and sort
+      const selectedAnswers = selectedAnswer.map(a => a.toUpperCase()).sort()
+      // Handle both string and array formats of correctanswer
+      const correctAnswers = Array.isArray(question.correctanswer)
+        ? question.correctanswer.map(a => a.toUpperCase()).sort()
+        : question.correctanswer
+        // TODO: This is a temporary fix to handle the array format
+            .replace(/[\[\]'"]/g, '') // Remove any brackets or quotes
+            .split(',')
+            .map(a => a.trim().toUpperCase())
+            .sort()
+      
+      correct = selectedAnswers.join(',') === correctAnswers.join(',')
+    } else if (question.type === 'SINGLE_CHOICE') {
       const correctAnswer = Array.isArray(question.correctanswer) 
         ? question.correctanswer[0] 
-        : question.correctanswer.replace(/[\[\]'"]/g, '') // Remove brackets and quotes if present
+        : question.correctanswer.replace(/[\[\]'"]/g, '')
 
-      correct = selectedAnswer.toUpperCase() === correctAnswer
-    } else if (question.type === 'MULTIPLE_CHOICE') {
-      const selectedAnswers = selectedAnswer.split(',').map(a => a.trim().toUpperCase()).sort()
-      const correctAnswers = question.correctanswer.split(',').map(a => a.trim().toUpperCase()).sort()
-      correct = selectedAnswers.join(',') === correctAnswers.join(',')
+      correct = selectedAnswer[0].toUpperCase() === correctAnswer
     }
 
     try {
@@ -74,7 +82,7 @@ export function QuestionAttempt({ question, testId, previousResponse }: Question
         .from('test_prep_user_responses')
         .insert({
           question_id: question.id,
-          selected_answers: [selectedAnswer.toUpperCase()],
+          selected_answers: selectedAnswer.map(a => a.toUpperCase()),
           is_correct: correct,
           attempt_number: nextAttemptNumber,
           test_id: testId || null
@@ -104,7 +112,17 @@ export function QuestionAttempt({ question, testId, previousResponse }: Question
 
   const handleOptionClick = (key: string) => {
     if (isSubmitted) return
-    setSelectedAnswer(key)
+    if (question.type === 'MULTIPLE_CHOICE') {
+      // Toggle selection for multiple choice
+      setSelectedAnswer(prev => 
+        prev.includes(key) 
+          ? prev.filter(k => k !== key)
+          : [...prev, key]
+      )
+    } else {
+      // Single choice behavior
+      setSelectedAnswer([key])
+    }
   }
 
   return (
@@ -121,14 +139,14 @@ export function QuestionAttempt({ question, testId, previousResponse }: Question
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid gap-2">
             {Object.entries(question.options).map(([key, value]) => {
-              const isSelected = selectedAnswer === key
+              const isSelected = selectedAnswer.includes(key)
               const isCorrectAnswer = isSubmitted && question.correctanswer.includes(key.toUpperCase())
               
               return (
                 <Button
                   key={key}
                   type="button"
-                  variant={isSelected ? "secondary" : "ghost"}
+                  variant={selectedAnswer.includes(key) ? "secondary" : "ghost"}
                   className={`w-full justify-start text-left font-normal text-base h-auto whitespace-normal px-4 py-3 ${
                     isSubmitted && isCorrectAnswer
                       ? 'border-2 border-green-500 dark:border-green-400'
