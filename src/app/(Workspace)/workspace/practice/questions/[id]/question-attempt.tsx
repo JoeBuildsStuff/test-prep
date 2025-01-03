@@ -19,9 +19,10 @@ interface QuestionAttemptProps {
     section: string | null
     subsection: string | null
   }
+  testId?: string
 }
 
-export function QuestionAttempt({ question }: QuestionAttemptProps) {
+export function QuestionAttempt({ question, testId }: QuestionAttemptProps) {
   const supabase = createClient()
 
   const [selectedAnswer, setSelectedAnswer] = useState<string>('')
@@ -61,7 +62,8 @@ export function QuestionAttempt({ question }: QuestionAttemptProps) {
           question_id: question.id,
           selected_answers: [selectedAnswer.toUpperCase()],
           is_correct: correct,
-          attempt_number: nextAttemptNumber
+          attempt_number: nextAttemptNumber,
+          test_id: testId || null
         })
 
       if (error) throw error

@@ -71,7 +71,10 @@ export default async function TestPage({
                                 Question {index + 1} of {questions.length}
                             </h2>
                         </div>
-                        <QuestionAttempt question={question} />
+                        <QuestionAttempt 
+                            question={question} 
+                            testId={id}
+                        />
                     </div>
                 ))}
             </div>
