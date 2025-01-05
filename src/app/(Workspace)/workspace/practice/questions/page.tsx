@@ -10,7 +10,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
+
 import { Separator } from "@/components/ui/separator"
 import Link from 'next/link'
 
@@ -19,12 +19,27 @@ export default async function QuestionBankPage() {
 
     const { data: questions, error } = await supabase
         .from('test_prep_questions')
-        .select('id, type, section, subsection, difficulty')
+        .select(`
+            id, 
+            type,
+            section:test_prep_sections(name),
+            subsection:test_prep_subsections(name)
+        `)
+        .returns<Array<{
+            id: string;
+            type: string;
+            section: { name: string } | null;
+            subsection: { name: string } | null;
+        }>>()
 
     if (error) {
         console.error('Error fetching questions:', error)
         return <div>Error fetching questions</div>
     }
+
+    const sectionsArray = questions
+        .map(q => q.section?.name)
+        .filter(Boolean) as string[]
 
     return (
         <div className="space-y-6">
@@ -37,22 +52,9 @@ export default async function QuestionBankPage() {
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="all">All Sections</SelectItem>
-                            {[...new Set(questions.map(q => q.section))].map(section => (
-                                <SelectItem key={section} value={section || 'none'}>
+                            {[...new Set(sectionsArray)].map(section => (
+                                <SelectItem key={section} value={section}>
                                     {section || 'No Section'}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                    <Select>
-                        <SelectTrigger className="w-[180px]">
-                            <SelectValue placeholder="All Difficulties" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All Difficulties</SelectItem>
-                            {[...new Set(questions.map(q => q.difficulty))].map(difficulty => (
-                                <SelectItem key={difficulty} value={difficulty || 'none'}>
-                                    {difficulty || 'Unspecified'}
                                 </SelectItem>
                             ))}
                         </SelectContent>
@@ -70,11 +72,11 @@ export default async function QuestionBankPage() {
                     },
                     { 
                         label: "Sections", 
-                        value: new Set(questions.map(q => q.section)).size 
+                        value: new Set(questions.map(q => q.section?.name)).size 
                     },
                     { 
                         label: "Subsections", 
-                        value: new Set(questions.map(q => q.subsection)).size 
+                        value: new Set(questions.map(q => q.subsection?.name)).size 
                     },
                 ].map((stat) => (
                     <Card key={stat.label}>
@@ -100,28 +102,18 @@ export default async function QuestionBankPage() {
                                 >
                                     <div className="space-y-1">
                                         <div className="flex items-center gap-2">
-                                            <Badge variant={
-                                                !question.difficulty ? 'secondary'
-                                                : question.difficulty.toLowerCase() === 'hard' 
-                                                    ? 'destructive'
-                                                    : question.difficulty.toLowerCase() === 'medium'
-                                                    ? 'outline'
-                                                    : 'default'
-                                            }>
-                                                {question.difficulty || 'Unspecified'}
-                                            </Badge>
                                             <span className="text-sm text-muted-foreground">
                                                 {question.type || 'No Type'}
                                             </span>
                                             <span className="text-sm text-muted-foreground">•</span>
                                             <span className="text-sm text-muted-foreground">
-                                                {question.section || 'No Section'}
+                                                {question.section?.name || 'No Section'}
                                             </span>
                                             {question.subsection && (
                                                 <>
                                                     <span className="text-sm text-muted-foreground">•</span>
                                                     <span className="text-sm text-muted-foreground">
-                                                        {question.subsection}
+                                                        {question.subsection.name}
                                                     </span>
                                                 </>
                                             )}

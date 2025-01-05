@@ -1,28 +1,10 @@
 import { createClient } from '@/utils/supabase/server'
 import { notFound } from 'next/navigation'
-import { Badge } from "@/components/ui/badge"
 import { QuestionAttempt } from './question-attempt'
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-
-interface QuestionOptions {
-  [key: string]: string;
-}
-
-interface Question {
-  id: string;
-  type: string;
-  section: string | null;
-  subsection: string | null;
-  difficulty: string | null;
-  question: string;
-  options: QuestionOptions;
-  correctanswer: string;
-  explanation: string;
-  created_at: string;
-  updated_at: string;
-}
+import { TestPrepQuestion } from '@/utils/supabase/types'
 
 const formatQuestionId = (num: number): string => {
   return `Q${num.toString().padStart(3, '0')}`
@@ -42,9 +24,20 @@ export default async function QuestionPage({
 
   const { data: question, error } = await supabase
     .from('test_prep_questions')
-    .select('*')
+    .select(`
+      *,
+      section:test_prep_sections(name),
+      subsection:test_prep_subsections(name),
+      tags:test_prep_question_tags(
+        tag:test_prep_tags(name)
+      )
+    `)
     .eq('id', id)
-    .single<Question>()
+    .single<TestPrepQuestion & {
+      section: { name: string } | null;
+      subsection: { name: string } | null;
+      tags: { tag: { name: string } }[];
+    }>()
 
   if (error || !question) {
     notFound()
@@ -59,6 +52,13 @@ export default async function QuestionPage({
     .select('id')
     .eq('id', nextId)
     .single()
+
+  const questionForAttempt = {
+    ...question,
+    section: question.section?.name || null,
+    subsection: question.subsection?.name || null,
+    tags: question.tags.map(({ tag }) => tag.name)
+  }
 
   return (
     <div className="space-y-6 max-w-3xl mx-auto">
@@ -87,23 +87,9 @@ export default async function QuestionPage({
 
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold">Question #{question.id}</h1>
-        <div className="flex items-center gap-2">
-          {question.difficulty && (
-            <Badge variant={
-              question.difficulty.toLowerCase() === 'hard' 
-                ? 'destructive'
-                : question.difficulty.toLowerCase() === 'medium'
-                ? 'outline'
-                : 'default'
-            }>
-              {question.difficulty}
-            </Badge>
-          )}
-          <Badge variant="secondary">{question.type}</Badge>
-        </div>
       </div>
 
-      <QuestionAttempt question={question} />
+      <QuestionAttempt question={questionForAttempt} />
 
       <div className="flex items-center justify-between">
         <Link href={prevId ? `/workspace/practice/questions/${prevId}` : '#'}>
