@@ -182,7 +182,7 @@ export function QuestionAttempt({ question, testId, previousResponse }: Question
         <CardFooter className="flex flex-col items-start space-y-4">
           <div className="space-y-6 w-full">
             <div className={cn(
-              "flex items-center gap-2 p-4 rounded-lg border ring-1 ring-inset",
+              "flex items-center gap-2 p-4 rounded-lg ring-1 ring-inset",
               isCorrect 
                 ? "bg-green-50 text-green-700 dark:text-green-400 dark:bg-green-900/20 ring-green-600/20 dark:ring-green-600/30"
                 : "bg-red-50 text-red-700 dark:text-red-400 dark:bg-red-900/20 ring-red-600/10 dark:ring-red-600/30"
