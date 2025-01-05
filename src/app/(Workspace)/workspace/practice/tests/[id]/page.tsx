@@ -15,6 +15,25 @@ interface TestQuestion {
     type: string
     section: string | null
     subsection: string | null
+    tags: string[]
+    test_prep_user_responses: Array<{
+        selected_answers: string[]
+        is_correct: boolean
+    }>
+}
+
+// Add interface for raw data from Supabase
+interface RawTestQuestion {
+    id: string
+    question: string
+    options: Record<string, string>
+    correctanswer: string
+    explanation: string
+    markdown_explanation: string
+    type: string
+    section: { name: string } | null
+    subsection: { name: string } | null
+    tags: Array<{ tag: { name: string } }>
     test_prep_user_responses: Array<{
         selected_answers: string[]
         is_correct: boolean
@@ -27,12 +46,7 @@ interface Test {
     test_prep_test_questions: Array<{
         order: number
         question_id: string
-        test_prep_questions: TestQuestion & {
-            test_prep_user_responses: Array<{
-                selected_answers: string[]
-                is_correct: boolean
-            }>
-        }
+        test_prep_questions: RawTestQuestion
     }>
 }
 
@@ -54,6 +68,11 @@ export default async function TestPage({
             question_id, 
             test_prep_questions(
                 *,
+                section:test_prep_sections(name),
+                subsection:test_prep_subsections(name),
+                tags:test_prep_question_tags(
+                    tag:test_prep_tags(name)
+                ),
                 test_prep_user_responses(
                     selected_answers, 
                     is_correct
@@ -62,7 +81,7 @@ export default async function TestPage({
         )
     `)
     .eq('id', id)
-    .eq('test_prep_test_questions.test_prep_questions.test_prep_user_responses.test_id', id)  // Updated filter path
+    .eq('test_prep_test_questions.test_prep_questions.test_prep_user_responses.test_id', id)
     .single() as { data: Test | null, error: PostgrestError | null }
 
 
@@ -74,10 +93,17 @@ export default async function TestPage({
     // Sort questions by order
     const questions = test.test_prep_test_questions
         .sort((a, b) => a.order - b.order)
-        .map(q => ({
-            ...q.test_prep_questions,
-            test_prep_user_responses: q.test_prep_questions.test_prep_user_responses || []
-        }))
+        .map(q => {
+            const rawQuestion = q.test_prep_questions as RawTestQuestion
+            const question: TestQuestion = {
+                ...rawQuestion,
+                section: rawQuestion.section?.name || null,
+                subsection: rawQuestion.subsection?.name || null,
+                tags: rawQuestion.tags?.map(({ tag }) => tag.name) || [],
+                test_prep_user_responses: rawQuestion.test_prep_user_responses || []
+            }
+            return question
+        })
 
     // Calculate attempted count
     const attemptedCount = questions.filter(q => q.test_prep_user_responses.length > 0).length

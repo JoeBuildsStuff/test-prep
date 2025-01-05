@@ -34,7 +34,10 @@ export default async function TestsPage() {
             *,
             test_prep_test_questions(
                 question_id,
-                test_prep_questions(section)
+                test_prep_questions_2:question_id(
+                    section_id,
+                    test_prep_sections(name)
+                )
             ),
             test_prep_user_responses(is_correct)
         `)
