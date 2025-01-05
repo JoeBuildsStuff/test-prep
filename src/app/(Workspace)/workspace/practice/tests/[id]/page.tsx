@@ -11,6 +11,7 @@ interface TestQuestion {
     options: Record<string, string>
     correctanswer: string
     explanation: string
+    markdown_explanation: string
     type: string
     section: string | null
     subsection: string | null
