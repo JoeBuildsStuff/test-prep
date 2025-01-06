@@ -4,7 +4,6 @@ import * as React from "react"
 import {
   BookOpen,
   PieChart,
-  Settings2,
   SquareTerminal,
 } from "lucide-react"
 
@@ -69,48 +68,6 @@ const data = {
         {
           title: "Mock Tests",
           url: "/workspace/practice/tests",
-        },
-        {
-          title: "Flash Cards",
-          url: "/workspace/practice/flashcards",
-        },
-      ],
-    },
-    {
-      title: "Study Material",
-      url: "/workspace/study",
-      icon: BookOpen,
-      items: [
-        {
-          title: "By Section",
-          url: "/workspace/study/sections",
-        },
-        {
-          title: "By Difficulty",
-          url: "/workspace/study/difficulty",
-        },
-        {
-          title: "Bookmarked",
-          url: "/workspace/study/bookmarked",
-        },
-      ],
-    },
-    {
-      title: "Settings",
-      url: "/workspace/settings",
-      icon: Settings2,
-      items: [
-        {
-          title: "Profile",
-          url: "/workspace/settings/profile",
-        },
-        {
-          title: "Preferences",
-          url: "/workspace/settings/preferences",
-        },
-        {
-          title: "Subscription",
-          url: "/workspace/settings/subscription",
         },
       ],
     },

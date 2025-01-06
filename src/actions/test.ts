@@ -30,3 +30,20 @@ export async function createNewTest() {
     return { test: null, error: 'Failed to create test' }
   }
 }
+
+export async function deleteTest(testId: string) {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+  .from('test_prep_tests')
+  .delete()
+  .eq('id', testId);
+
+if (error) {
+  console.error('Error deleting test:', error);
+} else {
+  console.log('Test deleted successfully:', data);
+}
+
+  revalidatePath('/workspace/practice/tests')
+}
