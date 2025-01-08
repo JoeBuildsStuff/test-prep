@@ -19,7 +19,7 @@ export function QuestionMetadata({ section, subsection, type, tags = [] }: Quest
             <p className="text-sm text-muted-foreground">Section</p>
             <p className="text-lg font-medium">{section || 'Uncategorized'}</p>
           </div>
-          <Badge variant="secondary" className="flex items-center gap-2 bg-white/5 text-white px-4 py-2">
+          <Badge variant="gray" className="">
             <Binary className="h-4 w-4" />
             <span className="text-sm font-medium">{type}</span>
           </Badge>
@@ -47,8 +47,8 @@ export function QuestionMetadata({ section, subsection, type, tags = [] }: Quest
                 {tags.map((tag) => (
                   <Badge
                     key={tag}
-                    variant="outline"
-                    className="bg-white/5 hover:bg-white/10 transition duration-300"
+                    variant="blue"
+                    className="px-2 py-1"
                   >
                     {tag}
                   </Badge>

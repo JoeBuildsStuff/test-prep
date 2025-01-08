@@ -1,18 +1,7 @@
-'use server'
-
 import { createClient } from '@/utils/supabase/server'
-import { Button } from '@/components/ui/button'
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-
-import { Separator } from "@/components/ui/separator"
-import Link from 'next/link'
+import { DataTable } from './components/data-table'
+import { columns } from './components/columns'
 
 export default async function QuestionBankPage() {
     const supabase = await createClient()
@@ -22,14 +11,19 @@ export default async function QuestionBankPage() {
         .select(`
             id, 
             type,
+            title_short,
             section:test_prep_sections(name),
-            subsection:test_prep_subsections(name)
+            subsection:test_prep_subsections(name),
+            tags:test_prep_tags(name)
         `)
+        .order('id', { ascending: true })
         .returns<Array<{
             id: string;
             type: string;
+            title_short: string;
             section: { name: string } | null;
             subsection: { name: string } | null;
+            tags: { name: string }[] | null;
         }>>()
 
     if (error) {
@@ -37,29 +31,24 @@ export default async function QuestionBankPage() {
         return <div>Error fetching questions</div>
     }
 
-    const sectionsArray = questions
-        .map(q => q.section?.name)
-        .filter(Boolean) as string[]
+    if (!questions) {
+        return <div>No questions found</div>
+    }
+
+    // Transform the data to match the DataTable's expected format
+    const transformedQuestions = questions.map(q => ({
+        id: q.id,
+        type: q.type,
+        title: q.title_short,
+        section: q.section?.name ?? '',
+        subsection: q.subsection?.name ?? '',
+        tags: q.tags?.map(t => t.name).join(', ') ?? ''
+    }))
 
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <h1 className="text-3xl font-bold">Question Bank</h1>
-                <div className="flex gap-2">
-                    <Select>
-                        <SelectTrigger className="w-[180px]">
-                            <SelectValue placeholder="All Sections" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="all">All Sections</SelectItem>
-                            {[...new Set(sectionsArray)].map(section => (
-                                <SelectItem key={section} value={section}>
-                                    {section || 'No Section'}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
             </div>
 
             {/* Stats Overview */}
@@ -67,16 +56,19 @@ export default async function QuestionBankPage() {
                 {[
                     { label: "Total Questions", value: questions.length },
                     { 
-                        label: "Question Types", 
-                        value: new Set(questions.map(q => q.type)).size 
-                    },
-                    { 
                         label: "Sections", 
-                        value: new Set(questions.map(q => q.section?.name)).size 
+                        value: new Set(questions.map(q => q.section?.name).filter(Boolean)).size 
                     },
                     { 
                         label: "Subsections", 
-                        value: new Set(questions.map(q => q.subsection?.name)).size 
+                        value: new Set(questions.map(q => q.subsection?.name).filter(Boolean)).size 
+                    },
+                    { 
+                        label: "Tags", 
+                        value: new Set(
+                            questions
+                                .flatMap(q => q.tags?.map(tag => tag.name) || [])
+                        ).size 
                     },
                 ].map((stat) => (
                     <Card key={stat.label}>
@@ -90,46 +82,7 @@ export default async function QuestionBankPage() {
                 ))}
             </div>
 
-            {/* Questions List */}
-            <Card className="border-none">
-                <CardContent className="p-4">
-                    <div className="space-y-4">
-                        {questions.map((question, index) => (
-                            <>
-                                <div 
-                                    key={question.id} 
-                                    className="flex items-center justify-between p-2 hover:bg-muted/50 rounded-lg"
-                                >
-                                    <div className="space-y-1">
-                                        <div className="flex items-center gap-2">
-                                            <span className="text-sm text-muted-foreground">
-                                                {question.type || 'No Type'}
-                                            </span>
-                                            <span className="text-sm text-muted-foreground">•</span>
-                                            <span className="text-sm text-muted-foreground">
-                                                {question.section?.name || 'No Section'}
-                                            </span>
-                                            {question.subsection && (
-                                                <>
-                                                    <span className="text-sm text-muted-foreground">•</span>
-                                                    <span className="text-sm text-muted-foreground">
-                                                        {question.subsection.name}
-                                                    </span>
-                                                </>
-                                            )}
-                                        </div>
-                                        <h3 className="font-medium">Question #{question.id}</h3>
-                                    </div>
-                                    <Link href={`/workspace/practice/questions/${question.id}`}>
-                                        <Button size="sm" variant="secondary">Select</Button>
-                                    </Link>
-                                </div>
-                                {index < questions.length - 1 && <Separator />}
-                            </>
-                        ))}
-                    </div>
-                </CardContent>
-            </Card>
+            <DataTable data={transformedQuestions} columns={columns} />
 
             {/* Empty State */}
             {questions.length === 0 && (
