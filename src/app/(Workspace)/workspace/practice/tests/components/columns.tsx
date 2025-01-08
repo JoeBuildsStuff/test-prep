@@ -6,7 +6,7 @@ import { format } from "date-fns"
 
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
-import { Test } from "../page"
+import { Test } from "./schema"
 
 
 export const columns: ColumnDef<Test>[] = [
