@@ -163,6 +163,24 @@ export const columns: ColumnDef<UserResponse>[] = [
     },
   },
   {
+    accessorKey: "test_id",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Test ID" />
+    ),
+    cell: ({ row }) => {
+      const testId = row.getValue("test_id") as string | null
+      return (
+        <div className="w-fit">
+          {testId ? (
+            <Badge variant="outline">
+              {testId ? `${testId.slice(0, 3)}...${testId.slice(-3)}` : ""}
+            </Badge>
+          ) : "-"}
+        </div>
+      )
+    },
+  },
+  {
     id: "actions",
     cell: ({ row }) => <DataTableRowActions row={row} />,
   },

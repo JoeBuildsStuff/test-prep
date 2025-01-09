@@ -3,8 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { DataTable } from './components/data-table'
 import { columns } from './components/columns'
 
-export default async function QuestionBankPage() {
+export default async function QuestionBankPage({
+    searchParams,
+}: {
+    searchParams: { [key: string]: string | string[] | undefined }
+}) {
     const supabase = await createClient()
+    const section = searchParams.section as string | undefined
+    const subsection = searchParams.subsection as string | undefined
 
     const { data: questions, error } = await supabase
         .from('test_prep_questions')
@@ -82,7 +88,20 @@ export default async function QuestionBankPage() {
                 ))}
             </div>
 
-            <DataTable data={transformedQuestions} columns={columns} />
+            <DataTable 
+                data={transformedQuestions} 
+                columns={columns} 
+                initialFilters={[
+                    ...(section ? [{
+                        id: 'section',
+                        value: [section]
+                    }] : []),
+                    ...(subsection ? [{
+                        id: 'subsection',
+                        value: [subsection]
+                    }] : [])
+                ]}
+            />
 
             {/* Empty State */}
             {questions.length === 0 && (

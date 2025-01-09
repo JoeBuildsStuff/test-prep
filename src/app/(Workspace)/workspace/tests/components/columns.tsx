@@ -4,6 +4,7 @@ import { ColumnDef } from "@tanstack/react-table"
 import { Checkbox } from "@/components/ui/checkbox"
 import { format } from "date-fns"
 import { Badge } from "@/components/ui/badge"
+import Link from "next/link"
 
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
@@ -77,28 +78,58 @@ export const columns: ColumnDef<Test>[] = [
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Total Questions" />
     ),
-    cell: ({ row }) => <div className="w-fit">{row.getValue("total_questions")}</div>,
+    cell: ({ row }) => <div className="w-fit"><Badge variant="outline">{row.getValue("total_questions")}</Badge></div>,
   },
   {
     accessorKey: "completed_questions",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Completed" />
     ),
-    cell: ({ row }) => <div className="w-fit">{row.getValue("completed_questions")}</div>,
+    cell: ({ row }) => {
+      const completedQuestions = row.getValue("completed_questions") as number
+      const testId = row.getValue("id") as string
+      return (
+        <div className="w-fit">
+          <Link href={`/workspace/history?test_id=${testId}`}>
+            <Badge variant="outline">{completedQuestions}</Badge>
+          </Link>
+        </div>
+      )
+    },
   },
   {
     accessorKey: "correct_answers",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Correct" />
     ),
-    cell: ({ row }) => <div className="w-fit">{row.getValue("correct_answers")}</div>,
+    cell: ({ row }) => {
+      const correctCount = row.getValue("correct_answers") as number
+      const testId = row.getValue("id") as string
+      return (
+        <div className="w-fit">
+          <Link href={`/workspace/history?test_id=${testId}&is_correct=true`}>
+            <Badge variant="outline">{correctCount}</Badge>
+          </Link>
+        </div>
+      )
+    },
   },
   {
     accessorKey: "wrong_answers",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Wrong" />
     ),
-    cell: ({ row }) => <div className="w-fit">{row.getValue("wrong_answers")}</div>,
+    cell: ({ row }) => {
+      const wrongCount = row.getValue("wrong_answers") as number
+      const testId = row.getValue("id") as string
+      return (
+        <div className="w-fit">
+          <Link href={`/workspace/history?test_id=${testId}&is_correct=false`}>
+            <Badge variant="outline">{wrongCount}</Badge>
+          </Link>
+        </div>
+      )
+    },
   },
   {
     accessorKey: "score",
@@ -107,16 +138,19 @@ export const columns: ColumnDef<Test>[] = [
     ),
     cell: ({ row }) => {
       const score = row.getValue("score") as number
+      const testId = row.getValue("id") as string
       return (
         <div className="w-fit">
           {score > 0 ? (
-            <Badge variant={
-              score >= 70 ? "green" : 
-              score >= 50 ? "yellow" : 
-              "red"
-            }>
-              {score}%
-            </Badge>
+            <Link href={`/workspace/history?test_id=${testId}`}>
+              <Badge variant={
+                score >= 70 ? "green" : 
+                score >= 50 ? "yellow" : 
+                "red"
+              }>
+                {score}%
+              </Badge>
+            </Link>
           ) : null}
         </div>
       )

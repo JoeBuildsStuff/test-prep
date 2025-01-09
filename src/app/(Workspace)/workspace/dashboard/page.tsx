@@ -1,4 +1,5 @@
 import { createClient } from '@/utils/supabase/server'
+import Link from 'next/link'
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -216,17 +217,45 @@ export default async function DashboardPage() {
                         return (
                           <TableRow key={subsection.id}>
                             <TableCell>{subsection.name}</TableCell>
-                            <TableCell className="text-right">{questionCount}</TableCell>
-                            <TableCell className="text-right">{answeredCount}</TableCell>
+                            <TableCell className="text-right">
+                              <Link 
+                                href={`/workspace/questions?section=${encodeURIComponent(section.name)}&subsection=${encodeURIComponent(subsection.name)}`}
+                                className="hover:underline cursor-pointer"
+                              >
+                                <Badge 
+                                  className="cursor-pointer hover:opacity-80"
+                                  variant="outline"
+                                >
+                                  {questionCount}
+                                </Badge>
+                              </Link>
+                            </TableCell>
                             <TableCell className="text-right">
                               {answeredCount > 0 ? (
-                                <Badge variant={
-                                  accuracy >= 70 ? "green" : 
-                                  accuracy >= 50 ? "yellow" : 
-                                  "red"
-                                }>
-                                  {accuracy}%
-                                </Badge>
+                                <Link href={`/workspace/history?section=${encodeURIComponent(section.name)}&subsection=${encodeURIComponent(subsection.name)}`}>
+                                  <Badge 
+                                    className="cursor-pointer hover:opacity-80"
+                                    variant="outline"
+                                  >
+                                    {answeredCount}
+                                  </Badge>
+                                </Link>
+                              ) : null}
+                            </TableCell>
+                            <TableCell className="text-right">
+                              {answeredCount > 0 ? (
+                                <Link href={`/workspace/history?section=${encodeURIComponent(section.name)}&subsection=${encodeURIComponent(subsection.name)}`}>
+                                  <Badge 
+                                    className="cursor-pointer hover:opacity-80"
+                                    variant={
+                                      accuracy >= 70 ? "green" : 
+                                      accuracy >= 50 ? "yellow" : 
+                                      "red"
+                                    }
+                                  >
+                                    {accuracy}%
+                                  </Badge>
+                                </Link>
                               ) : null}
                             </TableCell>
                           </TableRow>
@@ -234,17 +263,44 @@ export default async function DashboardPage() {
                       })}
                       <TableRow className="font-medium">
                         <TableCell>Section Total</TableCell>
-                        <TableCell className="text-right">{totalQuestions}</TableCell>
-                        <TableCell className="text-right">{totalAttempted}</TableCell>
+                        <TableCell className="text-right">
+                          <Link 
+                            href={`/workspace/questions?section=${encodeURIComponent(section.name)}`}
+                            className="hover:underline cursor-pointer"
+                          ><Badge 
+                          className="cursor-pointer hover:opacity-80"
+                          variant="outline"
+                        >
+                            {totalQuestions}
+                            </Badge>
+                          </Link>
+                        </TableCell>
                         <TableCell className="text-right">
                           {totalAttempted > 0 ? (
-                            <Badge variant={
-                              sectionAccuracy >= 70 ? "green" : 
-                              sectionAccuracy >= 50 ? "yellow" : 
-                              "red"
-                            }>
-                              {sectionAccuracy}%
-                            </Badge>
+                            <Link href={`/workspace/history?section=${encodeURIComponent(section.name)}`}>
+                              <Badge 
+                                className="cursor-pointer hover:opacity-80"
+                                variant="outline"
+                              >
+                                {totalAttempted}
+                              </Badge>
+                            </Link>
+                          ) : null}
+                        </TableCell>
+                        <TableCell className="text-right">
+                          {totalAttempted > 0 ? (
+                            <Link href={`/workspace/history?section=${encodeURIComponent(section.name)}`}>
+                              <Badge 
+                                className="cursor-pointer hover:opacity-80"
+                                variant={
+                                  sectionAccuracy >= 70 ? "green" : 
+                                  sectionAccuracy >= 50 ? "yellow" : 
+                                  "red"
+                                }
+                              >
+                                {sectionAccuracy}%
+                              </Badge>
+                            </Link>
                           ) : null}
                         </TableCell>
                       </TableRow>

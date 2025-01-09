@@ -3,8 +3,16 @@ import { DataTable } from './components/data-table'
 import { columns } from './components/columns'
 import { UserResponse } from './components/schema'
 
-export default async function HistoryPage() {
+export default async function HistoryPage({
+    searchParams,
+}: {
+    searchParams: { [key: string]: string | string[] | undefined }
+}) {
     const supabase = await createClient()
+    const section = searchParams.section as string | undefined
+    const subsection = searchParams.subsection as string | undefined
+    const testId = searchParams.test_id as string | undefined
+    const isCorrect = searchParams.is_correct as string | undefined
 
     const { data: userResponses, error } = await supabase
         .from('test_prep_user_responses')
@@ -26,7 +34,6 @@ export default async function HistoryPage() {
         .order('id', { ascending: true })
         .returns<Array<UserResponse>>()
         
-            
     if (error) {
         console.error('Error fetching questions:', error)
         return <div>Error fetching questions</div>
@@ -40,8 +47,28 @@ export default async function HistoryPage() {
 
     return (
         <div>
-            <DataTable data={userResponses} columns={columns} />
-
+            <DataTable 
+                data={userResponses} 
+                columns={columns} 
+                initialFilters={[
+                    ...(section ? [{
+                        id: 'question.section.name',
+                        value: [section]
+                    }] : []),
+                    ...(subsection ? [{
+                        id: 'question.subsection.name',
+                        value: [subsection]
+                    }] : []),
+                    ...(testId ? [{
+                        id: 'test_id',
+                        value: [testId]
+                    }] : []),
+                    ...(isCorrect ? [{
+                        id: 'is_correct',
+                        value: [isCorrect === 'true' ? 'true' : 'false']
+                    }] : [])
+                ]}
+            />
         </div>
     )
 }
