@@ -3,6 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { Checkbox } from "@/components/ui/checkbox"
 import { format } from "date-fns"
+import { Badge } from "@/components/ui/badge"
 
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
@@ -105,9 +106,18 @@ export const columns: ColumnDef<Test>[] = [
       <DataTableColumnHeader column={column} title="Score" />
     ),
     cell: ({ row }) => {
+      const score = row.getValue("score") as number
       return (
         <div className="w-fit">
-          {row.getValue("score")}
+          {score > 0 ? (
+            <Badge variant={
+              score >= 70 ? "green" : 
+              score >= 50 ? "yellow" : 
+              "red"
+            }>
+              {score}%
+            </Badge>
+          ) : null}
         </div>
       )
     },
