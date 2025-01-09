@@ -166,15 +166,85 @@ function calculateSectionTotals(
   return { totalQuestions, totalAttempted, sectionAccuracy };
 }
 
+// Add this helper function near your other helpers
+function calculateOverallStats(
+  sections: Section[] | null,
+  questionCounts: QuestionCount[],
+  userResponses: Awaited<ReturnType<typeof fetchUserResponses>>
+) {
+  if (!sections) return { totalQuestions: 0, totalAttempted: 0, overallAccuracy: 0 };
+
+  const stats = sections.map(section => calculateSectionTotals(section, questionCounts, userResponses));
+  
+  const totalQuestions = stats.reduce((sum, stat) => sum + stat.totalQuestions, 0);
+  const totalAttempted = stats.reduce((sum, stat) => sum + stat.totalAttempted, 0);
+  
+  // Calculate overall accuracy from all responses
+  const overallAccuracy = userResponses && userResponses.length > 0
+    ? Math.round((userResponses.filter(r => r.is_correct).length / userResponses.length) * 100)
+    : 0;
+
+  return { totalQuestions, totalAttempted, overallAccuracy };
+}
+
 export default async function DashboardPage() {
   const userResponses = await fetchUserResponses()
   const sections = await fetchAllSectionsAndSubsections()
   const questionCounts = await fetchQuestionCounts()
 
+  // Add this right after the fetch calls
+  const { totalQuestions, totalAttempted, overallAccuracy } = calculateOverallStats(
+    sections,
+    questionCounts,
+    userResponses
+  );
+
   return (
     <div className="space-y-6">
       <h1 className="text-3xl font-bold">Dashboard Overview</h1>
-      
+
+      {/* Add Stats Overview */}
+      <div className="grid gap-4 md:grid-cols-4">
+        <Card>
+          <CardHeader className="p-4">
+            <CardTitle className="text-sm text-muted-foreground">Total Questions</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0 px-4 pb-4">
+            <div className="text-2xl font-bold">{totalQuestions}</div>
+          </CardContent>
+        </Card>
+        
+        <Card>
+          <CardHeader className="p-4">
+            <CardTitle className="text-sm text-muted-foreground">Questions Attempted</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0 px-4 pb-4">
+            <div className="text-2xl font-bold">{totalAttempted}</div>
+            <p className="text-xs text-muted-foreground">
+              {Math.round((totalAttempted / totalQuestions) * 100)}% Complete
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="p-4">
+            <CardTitle className="text-sm text-muted-foreground">Overall Accuracy</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0 px-4 pb-4">
+            <div className="text-2xl font-bold">{overallAccuracy}%</div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="p-4">
+            <CardTitle className="text-sm text-muted-foreground">Active Sections</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0 px-4 pb-4">
+            <div className="text-2xl font-bold">{sections?.length ?? 0}</div>
+          </CardContent>
+        </Card>
+      </div>
+
       <div className="space-y-8">
         {sections
           ?.sort((a, b) => a.name.localeCompare(b.name))
