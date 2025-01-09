@@ -4,6 +4,7 @@ import * as React from "react"
 import {
   BookOpen,
   CircleHelp,
+  Clock,
   File,
   PieChart,
 } from "lucide-react"
@@ -51,6 +52,11 @@ const data = {
       title: "Tests",
       url: "/workspace/tests",
       icon: File,
+    },
+    {
+      title: "History",
+      url: "/workspace/history",
+      icon: Clock,
     },
   ],
 }
