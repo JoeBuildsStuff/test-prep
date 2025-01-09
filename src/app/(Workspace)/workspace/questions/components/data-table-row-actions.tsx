@@ -24,7 +24,7 @@ export function DataTableRowActions<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
   const router = useRouter()
-  const testId = row.getValue('id') as string
+  const questionId = row.getValue('id') as string
 
   return (
     <div className="flex justify-end items-center space-x-2">
@@ -32,7 +32,7 @@ export function DataTableRowActions<TData>({
         variant="ghost"
         size="icon"
         className="h-8 w-8 p-0"
-        onClick={() => router.push(`/workspace/practice/tests/${testId}`)}
+        onClick={() => router.push(`/workspace/questions/${questionId}`)}
       >
         <ExternalLink size={16}/>
       </Button>

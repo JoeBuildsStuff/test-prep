@@ -7,9 +7,9 @@ import { Target, TrendingUp, CheckCircle2, ListChecks } from "lucide-react"
 import { createNewTest } from '@/actions/test'
 import { redirect } from 'next/navigation'
 
-import { DataTable } from "@/app/(Workspace)/workspace/practice/tests/components/data-table"
-import { columns } from "@/app/(Workspace)/workspace/practice/tests/components/columns"
-import { TestSchema, RawTestSchema, Test } from "@/app/(Workspace)/workspace/practice/tests/components/schema"
+import { DataTable } from "@/app/(Workspace)/workspace/tests/components/data-table"
+import { columns } from "@/app/(Workspace)/workspace/tests/components/columns"
+import { TestSchema, RawTestSchema, Test } from "@/app/(Workspace)/workspace/tests/components/schema"
 
 
 // Modify the form action to handle the response

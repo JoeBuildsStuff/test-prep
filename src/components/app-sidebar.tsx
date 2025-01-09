@@ -3,8 +3,9 @@
 import * as React from "react"
 import {
   BookOpen,
+  CircleHelp,
+  File,
   PieChart,
-  SquareTerminal,
 } from "lucide-react"
 
 import { NavMain } from "@/components/nav-main"
@@ -40,36 +41,16 @@ const data = {
       title: "Dashboard",
       url: "/workspace/dashboard",
       icon: PieChart,
-      isActive: true,
-      items: [
-        {
-          title: "Overview",
-          url: "/workspace/dashboard",
-        },
-        {
-          title: "Progress",
-          url: "/workspace/dashboard/progress",
-        },
-        {
-          title: "Analytics",
-          url: "/workspace/dashboard/analytics",
-        },
-      ],
     },
     {
-      title: "Practice",
-      url: "/workspace/practice",
-      icon: SquareTerminal,
-      items: [
-        {
-          title: "Question Bank",
-          url: "/workspace/practice/questions",
-        },
-        {
-          title: "Mock Tests",
-          url: "/workspace/practice/tests",
-        },
-      ],
+      title: "Questions",
+      url: "/workspace/questions",
+      icon: CircleHelp,
+    },
+    {
+      title: "Tests",
+      url: "/workspace/tests",
+      icon: File,
     },
   ],
 }
@@ -81,11 +62,8 @@ export function AppSidebar({ userData, ...props }: AppSidebarProps) {
   const navMainWithActive = data.navMain.map(item => ({
     ...item,
     isActive: pathname.startsWith(item.url),
-    items: item.items?.map(subItem => ({
-      ...subItem,
-      isActive: pathname === subItem.url
-    }))
   }))
+
   const user = {
     name: userData.email?.split('@')[0] || 'User',
     email: userData.email || '',

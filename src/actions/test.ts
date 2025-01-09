@@ -22,8 +22,8 @@ export async function createNewTest() {
     if (testError) throw testError
 
     // Redirect to the new test
-    revalidatePath('/workspace/practice/tests')
-    return { test, error: null, redirect: `/workspace/practice/tests/${test}` }
+    revalidatePath('/workspace/tests')
+    return { test, error: null, redirect: `/workspace/tests/${test}` }
 
   } catch (error) {
     console.error('Error creating test:', error)
@@ -45,5 +45,5 @@ if (error) {
   console.log('Test deleted successfully:', data);
 }
 
-  revalidatePath('/workspace/practice/tests')
+  revalidatePath('/workspace/tests')
 }

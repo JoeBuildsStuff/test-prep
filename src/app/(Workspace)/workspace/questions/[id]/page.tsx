@@ -63,7 +63,7 @@ export default async function QuestionPage({
   return (
     <div className="space-y-6 max-w-3xl mx-auto">
       <div className="flex items-center justify-between">
-        <Link href={prevId ? `/workspace/practice/questions/${prevId}` : '#'}>
+        <Link href={prevId ? `/workspace/questions/${prevId}` : '#'}>
           <Button 
             variant="outline" 
             size="sm"
@@ -73,7 +73,7 @@ export default async function QuestionPage({
             Previous
           </Button>
         </Link>
-        <Link href={nextExists ? `/workspace/practice/questions/${nextId}` : '#'}>
+        <Link href={nextExists ? `/workspace/questions/${nextId}` : '#'}>
           <Button 
             variant="outline" 
             size="sm"
@@ -92,7 +92,7 @@ export default async function QuestionPage({
       <QuestionAttempt question={questionForAttempt} />
 
       <div className="flex items-center justify-between">
-        <Link href={prevId ? `/workspace/practice/questions/${prevId}` : '#'}>
+        <Link href={prevId ? `/workspace/questions/${prevId}` : '#'}>
           <Button 
             variant="outline" 
             size="sm"
@@ -102,7 +102,7 @@ export default async function QuestionPage({
             Previous
           </Button>
         </Link>
-        <Link href={nextExists ? `/workspace/practice/questions/${nextId}` : '#'}>
+        <Link href={nextExists ? `/workspace/questions/${nextId}` : '#'}>
           <Button 
             variant="outline" 
             size="sm"
