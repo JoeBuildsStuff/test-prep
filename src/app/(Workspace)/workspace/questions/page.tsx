@@ -3,15 +3,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { DataTable } from './components/data-table'
 import { columns } from './components/columns'
 
-export default async function QuestionBankPage({
-    searchParams,
-}: {
-    searchParams: { [key: string]: string | string[] | undefined }
+export default async function QuestionBankPage(props: {
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
-    const supabase = await createClient()
+    const searchParams = await props.searchParams
     const section = searchParams.section as string | undefined
     const subsection = searchParams.subsection as string | undefined
 
+    const supabase = await createClient()
     const { data: questions, error } = await supabase
         .from('test_prep_questions')
         .select(`

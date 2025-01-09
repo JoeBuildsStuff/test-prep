@@ -3,16 +3,16 @@ import { DataTable } from './components/data-table'
 import { columns } from './components/columns'
 import { UserResponse } from './components/schema'
 
-export default async function HistoryPage({
-    searchParams,
-}: {
-    searchParams: { [key: string]: string | string[] | undefined }
+export default async function HistoryPage(props: {
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
-    const supabase = await createClient()
+    const searchParams = await props.searchParams
     const section = searchParams.section as string | undefined
     const subsection = searchParams.subsection as string | undefined
     const testId = searchParams.test_id as string | undefined
     const isCorrect = searchParams.is_correct as string | undefined
+
+    const supabase = await createClient()
 
     const { data: userResponses, error } = await supabase
         .from('test_prep_user_responses')
