@@ -10,7 +10,7 @@ export function TestProgress({ totalQuestions, attemptedQuestions, currentScore 
   const progressPercentage = (attemptedQuestions / totalQuestions) * 100
 
   return (
-    <div className="space-y-2 border-b pb-4">
+    <div className="bg-background/30 backdrop-blur-sm space-y-2 border-b pb-4">
       <div className="flex justify-between items-center">
         <div>Progress: {attemptedQuestions}/{totalQuestions} questions</div>
         {currentScore !== null && (

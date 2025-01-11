@@ -23,11 +23,16 @@ function generateBreadcrumbs(path: string) {
       // Create the URL for this breadcrumb
       const url = '/' + segments.slice(0, index + 1).join('/')
       
-      // Capitalize and clean up segment name
-      const name = segment
-        .split('-')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-        .join(' ')
+      // Format the name - if it's a long string (like UUID), truncate it
+      let name = segment
+      if (segment.length > 12) {  // You can adjust this threshold
+        name = `${segment.slice(0, 3)}...${segment.slice(-3)}`
+      } else {
+        name = segment
+          .split('-')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+          .join(' ')
+      }
       
       return { name, url }
     })

@@ -4,25 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 
 import { Target, TrendingUp, CheckCircle2, ListChecks } from "lucide-react"
-import { createNewTest } from '@/actions/test'
-import { redirect } from 'next/navigation'
 
 import { DataTable } from "@/app/(Workspace)/workspace/tests/components/data-table"
 import { columns } from "@/app/(Workspace)/workspace/tests/components/columns"
 import { TestSchema, RawTestSchema, Test } from "@/app/(Workspace)/workspace/tests/components/schema"
+import Link from 'next/link'
 
-
-// Modify the form action to handle the response
-const handleCreateTest = async () => {
-    'use server'
-    const result = await createNewTest()
-    if (result.error) {
-        throw new Error(result.error)
-    }
-    if (result.redirect) {
-        redirect(result.redirect)
-    }
-}
 
 // Add interface for user response
 interface TestUserResponse {
@@ -83,11 +70,11 @@ export default async function TestsPage() {
         <div className="space-y-6">
             <div className="flex justify-between items-center">
                 <h1 className="text-3xl font-bold">Practice Tests</h1>
-                <form action={handleCreateTest}>
-                    <Button type="submit" size="sm" variant="secondary">
+                <Link href="/workspace/tests/new">
+                    <Button size="sm" variant="secondary">
                         Create New Test
                     </Button>
-                </form>
+                </Link>
             </div>
 
             {/* Performance Overview */}
