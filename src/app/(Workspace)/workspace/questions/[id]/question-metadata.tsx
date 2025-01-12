@@ -1,4 +1,4 @@
-import { Binary, Tag } from "lucide-react"
+import { Tag } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
@@ -6,11 +6,10 @@ import { Badge } from "@/components/ui/badge"
 interface QuestionMetadataProps {
   section: string | null
   subsection: string | null
-  type: string
   tags?: string[]
 }
 
-export function QuestionMetadata({ section, subsection, type, tags = [] }: QuestionMetadataProps) {
+export function QuestionMetadata({ section, subsection, tags = [] }: QuestionMetadataProps) {
   return (
     <Card className="">
       <CardContent className="space-y-6">
@@ -19,10 +18,6 @@ export function QuestionMetadata({ section, subsection, type, tags = [] }: Quest
             <p className="text-sm text-muted-foreground">Section</p>
             <p className="text-lg font-medium">{section || 'Uncategorized'}</p>
           </div>
-          <Badge variant="gray" className="">
-            <Binary className="h-4 w-4" />
-            <span className="text-sm font-medium">{type}</span>
-          </Badge>
         </div>
 
         {subsection && (

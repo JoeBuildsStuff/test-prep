@@ -26,6 +26,7 @@ export default async function WorkspaceLayout({
       <SidebarProvider>
         <AppSidebar userData={data.user} />
         <SidebarInset>
+          <div className="grid min-h-[100dvh] grid-rows-[auto_1fr_auto]">
           <header className="sticky top-0 z-10 bg-background/30 backdrop-blur-sm flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
             <div className="flex items-center gap-2 px-4 flex-grow">
               <SidebarTrigger className="-ml-1" />
@@ -36,6 +37,10 @@ export default async function WorkspaceLayout({
           </header>
           <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
             {children}
+          </div>
+          <footer className="flex justify-center items-center h-16">
+         
+          </footer>
           </div>
         </SidebarInset>
       </SidebarProvider>

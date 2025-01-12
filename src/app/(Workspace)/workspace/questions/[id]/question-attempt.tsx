@@ -196,7 +196,6 @@ export function QuestionAttempt({ question, testId, previousResponse }: Question
             <QuestionMetadata
               section={question.section}
               subsection={question.subsection}
-              type={question.type}
               tags={question.tags}
             />
 
