@@ -139,7 +139,8 @@ export function QuestionAttempt({ question, testId, previousResponse }: Question
           <div className="grid gap-2">
             {Object.entries(question.options).map(([key, value]) => {
               const isSelected = selectedAnswer.includes(key)
-              const isCorrectAnswer = isSubmitted && question.correctanswer.includes(key.toUpperCase())
+              const wasSelectedPreviously = previousResponse?.selected_answers.includes(key.toUpperCase())
+              const isCorrectAnswer = question.correctanswer.includes(key.toUpperCase())
               
               return (
                 <Button
@@ -150,7 +151,7 @@ export function QuestionAttempt({ question, testId, previousResponse }: Question
                     "w-full justify-start text-left font-normal text-base h-auto whitespace-normal px-4 py-3",
                     "text-foreground disabled:opacity-100",
                     isSubmitted && isCorrectAnswer && "bg-green-50 text-green-700 dark:text-green-400 dark:bg-green-900/20 ring-1 ring-inset ring-green-600/20 dark:ring-green-600/30",
-                    isSubmitted && isSelected && !isCorrectAnswer && "bg-red-50 text-red-700 dark:text-red-400 dark:bg-red-900/20 ring-1 ring-inset ring-red-600/10 dark:ring-red-600/30",
+                    isSubmitted && (isSelected || wasSelectedPreviously) && !isCorrectAnswer && "bg-red-50 text-red-700 dark:text-red-400 dark:bg-red-900/20 ring-1 ring-inset ring-red-600/10 dark:ring-red-600/30",
                     !isSubmitted && isSelected && "bg-blue-50 text-blue-700 dark:text-blue-400 dark:bg-blue-900/20 ring-1 ring-inset ring-blue-700/10 dark:ring-blue-600/30"
                   )}
                   onClick={() => handleOptionClick(key)}
