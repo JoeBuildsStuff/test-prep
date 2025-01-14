@@ -261,18 +261,14 @@ export default async function DashboardPage() {
             );
 
             return (
-              <Card key={section.id}>
-                <CardHeader>
-                  <CardTitle>{section.name}</CardTitle>
-                </CardHeader>
-                <CardContent>
+              <Card key={section.id} className="p-4">
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead>Subsection</TableHead>
-                        <TableHead className="text-right">Total Questions</TableHead>
-                        <TableHead className="text-right">Attempted</TableHead>
-                        <TableHead className="text-right">Accuracy</TableHead>
+                        <TableHead className="w-full text-foreground text-lg font-bold">{section.name}</TableHead>
+                        <TableHead className="text-right w-fit">Questions</TableHead>
+                        <TableHead className="text-right w-fit">Attempted</TableHead>
+                        <TableHead className="text-right w-fit">Accuracy</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -286,8 +282,8 @@ export default async function DashboardPage() {
 
                         return (
                           <TableRow key={subsection.id}>
-                            <TableCell>{subsection.name}</TableCell>
-                            <TableCell className="text-right">
+                            <TableCell className="w-full">{subsection.name}</TableCell>
+                            <TableCell className="text-right w-fit">
                               <Link 
                                 href={`/workspace/questions?section=${encodeURIComponent(section.name)}&subsection=${encodeURIComponent(subsection.name)}`}
                                 className="hover:underline cursor-pointer"
@@ -300,7 +296,7 @@ export default async function DashboardPage() {
                                 </Badge>
                               </Link>
                             </TableCell>
-                            <TableCell className="text-right">
+                            <TableCell className="text-right w-fit">
                               {answeredCount > 0 ? (
                                 <Link href={`/workspace/history?section=${encodeURIComponent(section.name)}&subsection=${encodeURIComponent(subsection.name)}`}>
                                   <Badge 
@@ -312,7 +308,7 @@ export default async function DashboardPage() {
                                 </Link>
                               ) : null}
                             </TableCell>
-                            <TableCell className="text-right">
+                            <TableCell className="text-right w-fit">
                               {answeredCount > 0 ? (
                                 <Link href={`/workspace/history?section=${encodeURIComponent(section.name)}&subsection=${encodeURIComponent(subsection.name)}`}>
                                   <Badge 
@@ -332,8 +328,8 @@ export default async function DashboardPage() {
                         );
                       })}
                       <TableRow className="font-medium">
-                        <TableCell>Section Total</TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="w-full">Section Total</TableCell>
+                        <TableCell className="text-right w-fit">
                           <Link 
                             href={`/workspace/questions?section=${encodeURIComponent(section.name)}`}
                             className="hover:underline cursor-pointer"
@@ -345,7 +341,7 @@ export default async function DashboardPage() {
                             </Badge>
                           </Link>
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="text-right w-fit">
                           {totalAttempted > 0 ? (
                             <Link href={`/workspace/history?section=${encodeURIComponent(section.name)}`}>
                               <Badge 
@@ -357,7 +353,7 @@ export default async function DashboardPage() {
                             </Link>
                           ) : null}
                         </TableCell>
-                        <TableCell className="text-right">
+                        <TableCell className="text-right w-fit">
                           {totalAttempted > 0 ? (
                             <Link href={`/workspace/history?section=${encodeURIComponent(section.name)}`}>
                               <Badge 
@@ -376,7 +372,6 @@ export default async function DashboardPage() {
                       </TableRow>
                     </TableBody>
                   </Table>
-                </CardContent>
               </Card>
             );
           })}

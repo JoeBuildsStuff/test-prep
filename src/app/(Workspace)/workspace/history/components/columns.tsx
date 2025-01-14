@@ -3,6 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
+import Link from "next/link"
 
 import { UserResponse } from "./schema"
 import { DataTableColumnHeader } from "./data-table-column-header"
@@ -172,9 +173,11 @@ export const columns: ColumnDef<UserResponse>[] = [
       return (
         <div className="w-fit">
           {testId ? (
-            <Badge variant="outline">
-              {testId ? `${testId.slice(0, 3)}...${testId.slice(-3)}` : ""}
-            </Badge>
+            <Link href={`/workspace/tests?test_id=${testId}`}>
+              <Badge variant="outline">
+                {testId ? `${testId.slice(0, 3)}...${testId.slice(-3)}` : ""}
+              </Badge>
+            </Link>
           ) : "-"}
         </div>
       )

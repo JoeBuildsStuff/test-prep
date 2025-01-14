@@ -10,6 +10,8 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import { DynamicBreadcrumbs } from '@/components/dynamic-breadcrumbs'
 import { ModeToggle } from "@/components/ui/mode-toggle"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
 export default async function WorkspaceLayout({
   children
@@ -32,6 +34,13 @@ export default async function WorkspaceLayout({
               <SidebarTrigger className="-ml-1" />
               <Separator orientation="vertical" className="mr-2 h-4" />
               <DynamicBreadcrumbs />
+            </div>
+            <div className="flex justify-between items-center">
+                <Link href="/workspace/tests/new">
+                    <Button size="sm" variant="secondary">
+                        Create New Test
+                    </Button>
+                </Link>
             </div>
             <ModeToggle className="ml-auto mr-5 border-none" />
           </header>

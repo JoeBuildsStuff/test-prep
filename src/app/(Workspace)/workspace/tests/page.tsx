@@ -1,22 +1,22 @@
 import { createClient } from '@/utils/supabase/server'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
-import { Button } from "@/components/ui/button"
-
 import { Target, TrendingUp, CheckCircle2, ListChecks } from "lucide-react"
 
 import { DataTable } from "@/app/(Workspace)/workspace/tests/components/data-table"
 import { columns } from "@/app/(Workspace)/workspace/tests/components/columns"
 import { TestSchema, RawTestSchema, Test } from "@/app/(Workspace)/workspace/tests/components/schema"
-import Link from 'next/link'
-
 
 // Add interface for user response
 interface TestUserResponse {
     is_correct: boolean
 }
 
-export default async function TestsPage() {
+export default async function TestsPage({
+    searchParams
+}: {
+    searchParams: { [key: string]: string | string[] | undefined }
+}) {
     const supabase = await createClient()
 
     // Fetch user's tests with questions and responses
@@ -66,17 +66,13 @@ export default async function TestsPage() {
         })
     })
 
+    const testId = searchParams.test_id as string | undefined
+
     return (
         <div className="space-y-6">
-            <div className="flex justify-between items-center">
+                        <div className="flex items-center justify-between">
                 <h1 className="text-3xl font-bold">Practice Tests</h1>
-                <Link href="/workspace/tests/new">
-                    <Button size="sm" variant="secondary">
-                        Create New Test
-                    </Button>
-                </Link>
             </div>
-
             {/* Performance Overview */}
             <div className="grid gap-4 md:grid-cols-4">
                 {[
@@ -116,7 +112,16 @@ export default async function TestsPage() {
             </div>
 
             {/* Test History Table*/}
-            <DataTable columns={columns} data={tests} />
+            <DataTable 
+                columns={columns} 
+                data={tests} 
+                initialFilters={[
+                    ...(testId ? [{
+                        id: 'id',
+                        value: testId
+                    }] : [])
+                ]}
+            />
         </div>
     )
 }

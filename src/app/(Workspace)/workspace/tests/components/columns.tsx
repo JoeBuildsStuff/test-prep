@@ -38,10 +38,15 @@ export const columns: ColumnDef<Test>[] = [
   },
   {
     accessorKey: "id",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="#" className="pl-2" />
-    ),
-    cell: ({ row }) => <div className="pl-2 w-fit">{row.getValue("id")}</div>,
+    header: "Test ID", 
+    cell: ({ row }) => {
+      const testId = row.getValue("id") as string
+      return (
+        <Badge variant="outline" className="font-mono">
+          {`${testId.slice(0, 3)}...${testId.slice(-3)}`}
+        </Badge>
+      )
+    },
     enableSorting: true,
     enableHiding: true,
   },

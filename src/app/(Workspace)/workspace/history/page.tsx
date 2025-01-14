@@ -46,7 +46,10 @@ export default async function HistoryPage(props: {
     console.log(userResponses)
 
     return (
-        <div>
+        <div className="space-y-6">
+                        <div className="flex items-center justify-between">
+                <h1 className="text-3xl font-bold">Question History</h1>
+            </div>
             <DataTable 
                 data={userResponses} 
                 columns={columns} 
