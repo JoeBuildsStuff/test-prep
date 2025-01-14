@@ -9,6 +9,8 @@ export const QuestionSchema = z.object({
   section: z.string(),
   subsection: z.string(),
   tags: z.string(),
+  attempts: z.number(),
+  accuracy: z.number(),
 })
 
 export type Question = z.infer<typeof QuestionSchema>

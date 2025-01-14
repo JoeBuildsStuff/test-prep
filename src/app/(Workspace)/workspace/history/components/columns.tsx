@@ -69,6 +69,31 @@ export const columns: ColumnDef<UserResponse>[] = [
         </div>
       )
     },
+    filterFn: (row, id, value) => {
+      const rowValue = row.getValue(id) as string;
+      const searchValue = Array.isArray(value) ? value[0] : value;
+      return rowValue.toLowerCase().includes(String(searchValue).toLowerCase());
+    },
+  },
+  {
+    accessorKey: "test_id",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Test ID" />
+    ),
+    cell: ({ row }) => {
+      const testId = row.getValue("test_id") as string | null
+      return (
+        <div className="w-fit">
+          {testId ? (
+            <Link href={`/workspace/tests?test_id=${testId}`}>
+              <Badge variant="outline">
+                {testId ? `${testId.slice(0, 3)}...${testId.slice(-3)}` : ""}
+              </Badge>
+            </Link>
+          ) : "-"}
+        </div>
+      )
+    },
   },
   {
     accessorFn: (row) => row.question.title_short,
@@ -159,26 +184,6 @@ export const columns: ColumnDef<UserResponse>[] = [
       return (
         <div className="w-fit">
           {row.getValue("attempt_number")}
-        </div>
-      )
-    },
-  },
-  {
-    accessorKey: "test_id",
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Test ID" />
-    ),
-    cell: ({ row }) => {
-      const testId = row.getValue("test_id") as string | null
-      return (
-        <div className="w-fit">
-          {testId ? (
-            <Link href={`/workspace/tests?test_id=${testId}`}>
-              <Badge variant="outline">
-                {testId ? `${testId.slice(0, 3)}...${testId.slice(-3)}` : ""}
-              </Badge>
-            </Link>
-          ) : "-"}
         </div>
       )
     },

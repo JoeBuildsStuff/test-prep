@@ -9,6 +9,7 @@ export default async function QuestionBankPage(props: {
     const searchParams = await props.searchParams
     const section = searchParams.section as string | undefined
     const subsection = searchParams.subsection as string | undefined
+    const questionId = searchParams.id as string | undefined
 
     const supabase = await createClient()
     const { data: questions, error } = await supabase
@@ -19,7 +20,12 @@ export default async function QuestionBankPage(props: {
             title_short,
             section:test_prep_sections(name),
             subsection:test_prep_subsections(name),
-            tags:test_prep_tags(name)
+            tags:test_prep_tags(name),
+            user_responses:test_prep_user_responses(
+                is_correct,
+                created_at,
+                selected_answers
+            )
         `)
         .order('id', { ascending: true })
         .returns<Array<{
@@ -29,6 +35,11 @@ export default async function QuestionBankPage(props: {
             section: { name: string } | null;
             subsection: { name: string } | null;
             tags: { name: string }[] | null;
+            user_responses: Array<{
+                is_correct: boolean;
+                created_at: string;
+                selected_answers: string[];
+            }> | null;
         }>>()
 
     if (error) {
@@ -47,7 +58,14 @@ export default async function QuestionBankPage(props: {
         title: q.title_short,
         section: q.section?.name ?? '',
         subsection: q.subsection?.name ?? '',
-        tags: q.tags?.map(t => t.name).join(', ') ?? ''
+        tags: q.tags?.map(t => t.name).join(', ') ?? '',
+        attempts: q.user_responses?.length ?? 0,
+        accuracy: q.user_responses?.length 
+            ? Math.round((q.user_responses.filter(r => r.is_correct).length / q.user_responses.length) * 100)
+            : 0,
+        lastResponse: q.user_responses?.sort((a, b) => 
+            new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+        )[0] ?? null
     }))
 
     return (
@@ -98,6 +116,10 @@ export default async function QuestionBankPage(props: {
                     ...(subsection ? [{
                         id: 'subsection',
                         value: [subsection]
+                    }] : []),
+                    ...(questionId ? [{
+                        id: 'id',
+                        value: [questionId]
                     }] : [])
                 ]}
             />

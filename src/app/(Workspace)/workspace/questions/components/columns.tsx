@@ -3,6 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
+import Link from "next/link"
 
 import { Question } from "./schema"
 import { DataTableColumnHeader } from "./data-table-column-header"
@@ -41,6 +42,11 @@ export const columns: ColumnDef<Question>[] = [
     cell: ({ row }) => <div className="pl-2 w-fit">{row.getValue("id")}</div>,
     enableSorting: true,
     enableHiding: false,
+    filterFn: (row, id, value) => {
+      const rowValue = row.getValue(id) as string;
+      const searchValue = Array.isArray(value) ? value[0] : value;
+      return rowValue.toLowerCase().includes(String(searchValue).toLowerCase());
+    },
   },
   {
     accessorKey: "title",
@@ -107,6 +113,56 @@ export const columns: ColumnDef<Question>[] = [
     },
     filterFn: (row, id, value) => {
       return value.includes(row.getValue(id))
+    },
+  },
+  {
+    accessorKey: "attempts",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Attempts" />
+    ),
+    cell: ({ row }) => {
+      const attempts = row.getValue("attempts") as number
+      const questionId = row.getValue("id")
+      return (
+        <div className="w-fit">
+          {attempts > 0 ? (
+            <Link href={`/workspace/history?question_id=${questionId}`}>
+              <Badge variant="outline" className="cursor-pointer hover:opacity-80">
+                {attempts}
+              </Badge>
+            </Link>
+          ) : (
+            <Badge variant="outline">-</Badge>
+          )}
+        </div>
+      )
+    },
+  },
+  {
+    accessorKey: "accuracy",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Accuracy" />
+    ),
+    cell: ({ row }) => {
+      const attempts = row.getValue("attempts") as number
+      const accuracy = row.getValue("accuracy") as number
+      const questionId = row.getValue("id")
+      return (
+        <div className="w-fit">
+          {attempts === 0 ? (
+            "-"
+          ) : (
+            <Link href={`/workspace/history?question_id=${questionId}`}>
+              <Badge 
+                variant={accuracy >= 85 ? "green" : accuracy >= 70 ? "yellow" : "red"}
+                className="cursor-pointer hover:opacity-80"
+              >
+                {accuracy}%
+              </Badge>
+            </Link>
+          )}
+        </div>
+      )
     },
   },
   {

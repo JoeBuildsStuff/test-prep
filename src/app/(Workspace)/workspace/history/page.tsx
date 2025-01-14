@@ -11,6 +11,7 @@ export default async function HistoryPage(props: {
     const subsection = searchParams.subsection as string | undefined
     const testId = searchParams.test_id as string | undefined
     const isCorrect = searchParams.is_correct as string | undefined
+    const questionId = searchParams.question_id as string | undefined
 
     const supabase = await createClient()
 
@@ -67,6 +68,10 @@ export default async function HistoryPage(props: {
                     ...(isCorrect ? [{
                         id: 'is_correct',
                         value: [isCorrect === 'true' ? 'true' : 'false']
+                    }] : []),
+                    ...(questionId ? [{
+                        id: 'question_id',
+                        value: [questionId]
                     }] : [])
                 ]}
             />
