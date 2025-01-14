@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Check, Star } from "lucide-react"
+import { Bookmark, Check } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { createClient } from '@/utils/supabase/client'
@@ -165,7 +165,7 @@ export function QuestionAttempt({ question, testId, previousResponse }: Question
           {question.question}
           <Button
             variant="ghost"
-            size="icon"
+          
             onClick={handleFavoriteToggle}
             className={cn(
               "ml-2",
@@ -173,7 +173,7 @@ export function QuestionAttempt({ question, testId, previousResponse }: Question
               !isFavorited && "text-gray-400 hover:text-gray-500"
             )}
           >
-            <Star className={cn(
+            <Bookmark className={cn(
               "h-5 w-5",
               isFavorited && "fill-current"
             )} />
