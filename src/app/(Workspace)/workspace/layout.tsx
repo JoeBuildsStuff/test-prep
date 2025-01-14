@@ -10,13 +10,12 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import { DynamicBreadcrumbs } from '@/components/dynamic-breadcrumbs'
 import { ModeToggle } from "@/components/ui/mode-toggle"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
+import { NewTestButton } from "@/components/new-test-button"
 
 export default async function WorkspaceLayout({
-  children
+  children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode,
 }) {
     const supabase = await createClient()
     const { data, error } = await supabase.auth.getUser()
@@ -36,11 +35,7 @@ export default async function WorkspaceLayout({
               <DynamicBreadcrumbs />
             </div>
             <div className="flex justify-between items-center">
-                <Link href="/workspace/tests/new">
-                    <Button size="sm" variant="secondary">
-                        Create New Test
-                    </Button>
-                </Link>
+                <NewTestButton />
             </div>
             <ModeToggle className="ml-auto mr-5 border-none" />
           </header>

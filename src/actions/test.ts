@@ -9,7 +9,6 @@ interface TestCreationParams {
     includeUnused: boolean
     includeIncorrect: boolean
     includeCorrect: boolean
-    sections: string[]
     subsections: string[]
 }
 
@@ -26,31 +25,30 @@ export async function createNewTest(formData: FormData) {
             includeUnused: formData.get('includeUnused') === 'on',
             includeIncorrect: formData.get('includeIncorrect') === 'on',
             includeCorrect: formData.get('includeCorrect') === 'on',
-            sections: [],
             subsections: []
         }
 
         // Get selected sections and subsections
         for (const [key, value] of formData.entries()) {
-            if (key.startsWith('section-') && value === 'on') {
-                params.sections.push(key.replace('section-', ''))
-            }
             if (key.startsWith('subsection-') && value === 'on') {
                 params.subsections.push(key.replace('subsection-', ''))
             }
         }
+
+        console.log(params)
 
         // Create test using RPC
         const { data: test, error: testError } = await supabase
             .rpc('create_random_test', {
                 user_id_param: user?.id,
                 questions_count: params.questionCount,
-                section_ids: params.sections,
                 subsection_ids: params.subsections,
                 include_unused: params.includeUnused,
                 include_incorrect: params.includeIncorrect,
                 include_correct: params.includeCorrect
             })
+
+        console.log(test)
 
         if (testError) throw testError
 

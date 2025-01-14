@@ -153,7 +153,7 @@ export const columns: ColumnDef<Test>[] = [
                 score >= 50 ? "yellow" : 
                 "red"
               }>
-                {score}%
+                {Math.round(score)}%
               </Badge>
             </Link>
           ) : null}
