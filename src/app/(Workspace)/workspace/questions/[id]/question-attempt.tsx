@@ -10,7 +10,6 @@ import { cn } from "@/lib/utils"
 import { createClient } from '@/utils/supabase/client'
 import { QuestionMetadata } from "./question-metadata"
 import ReactMarkdown from 'react-markdown'
-import type { FormEvent } from 'react'
 
 interface QuestionAttemptProps {
   question: {
