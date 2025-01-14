@@ -43,8 +43,6 @@ export default async function HistoryPage(props: {
         return <div>No user responses found</div>
     }
 
-    console.log(userResponses)
-
     return (
         <div className="space-y-6">
                         <div className="flex items-center justify-between">

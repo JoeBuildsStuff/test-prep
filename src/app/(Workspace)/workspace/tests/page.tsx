@@ -15,8 +15,12 @@ interface TestUserResponse {
 export default async function TestsPage({
     searchParams
 }: {
-    searchParams: { [key: string]: string | string[] | undefined }
+    searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
+    // Await the searchParams
+    const params = await searchParams
+    const testId = params.test_id as string | undefined
+
     const supabase = await createClient()
 
     // Fetch user's tests with questions and responses
@@ -65,8 +69,6 @@ export default async function TestsPage({
             wrong_answers: wrongAnswers,
         })
     })
-
-    const testId = searchParams.test_id as string | undefined
 
     return (
         <div className="space-y-6">
