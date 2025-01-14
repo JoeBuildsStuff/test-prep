@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils"
 import { createClient } from '@/utils/supabase/client'
 import { QuestionMetadata } from "./question-metadata"
 import ReactMarkdown from 'react-markdown'
+import type { FormEvent } from 'react'
 
 interface QuestionAttemptProps {
   question: {
@@ -50,10 +51,10 @@ export function QuestionAttempt({ question, testId, previousResponse }: Question
     let correct = false
     if (question.type === 'MULTIPLE_CHOICE') {
       // Normalize both arrays: convert to uppercase and sort
-      const selectedAnswers = selectedAnswer.map(a => a.toUpperCase()).sort()
+      const selectedAnswers = selectedAnswer.map((a: string) => a.toUpperCase()).sort()
       // Handle both string and array formats of correctanswer
       const correctAnswers = Array.isArray(question.correctanswer)
-        ? question.correctanswer.map(a => a.toUpperCase()).sort()
+        ? question.correctanswer.map((a: string) => a.toUpperCase()).sort()
         : question.correctanswer
         // TODO: This is a temporary fix to handle the array format
             .replace(/[\[\]'"]/g, '') // Remove any brackets or quotes
@@ -86,7 +87,7 @@ export function QuestionAttempt({ question, testId, previousResponse }: Question
         .from('test_prep_user_responses')
         .insert({
           question_id: question.id,
-          selected_answers: selectedAnswer.map(a => a.toUpperCase()),
+          selected_answers: selectedAnswer.map((a: string) => a.toUpperCase()),
           is_correct: correct,
           attempt_number: nextAttemptNumber,
           test_id: testId || null
@@ -118,9 +119,9 @@ export function QuestionAttempt({ question, testId, previousResponse }: Question
     if (isSubmitted) return
     if (question.type === 'MULTIPLE_CHOICE') {
       // Toggle selection for multiple choice
-      setSelectedAnswer(prev => 
+      setSelectedAnswer((prev: string[]) => 
         prev.includes(key) 
-          ? prev.filter(k => k !== key)
+          ? prev.filter((k: string) => k !== key)
           : [...prev, key]
       )
     } else {
