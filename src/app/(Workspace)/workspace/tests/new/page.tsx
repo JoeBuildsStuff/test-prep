@@ -201,8 +201,8 @@ export default async function NewTestPage() {
                                                 {answeredCount > 0 && (
                                                     <Badge 
                                                         variant={
-                                                            accuracy >= 70 ? "green" : 
-                                                            accuracy >= 50 ? "yellow" : 
+                                                            accuracy >= 85 ? "green" : 
+                                                            accuracy >= 70 ? "yellow" : 
                                                             "red"
                                                         }
                                                     >

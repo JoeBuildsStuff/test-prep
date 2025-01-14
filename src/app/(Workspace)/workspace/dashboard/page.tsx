@@ -314,8 +314,8 @@ export default async function DashboardPage() {
                                   <Badge 
                                     className="cursor-pointer hover:opacity-80"
                                     variant={
-                                      accuracy >= 70 ? "green" : 
-                                      accuracy >= 50 ? "yellow" : 
+                                      accuracy >= 85 ? "green" : 
+                                      accuracy >= 70 ? "yellow" : 
                                       "red"
                                     }
                                   >
@@ -359,8 +359,8 @@ export default async function DashboardPage() {
                               <Badge 
                                 className="cursor-pointer hover:opacity-80"
                                 variant={
-                                  sectionAccuracy >= 70 ? "green" : 
-                                  sectionAccuracy >= 50 ? "yellow" : 
+                                  sectionAccuracy >= 85 ? "green" : 
+                                  sectionAccuracy >= 70 ? "yellow" : 
                                   "red"
                                 }
                               >

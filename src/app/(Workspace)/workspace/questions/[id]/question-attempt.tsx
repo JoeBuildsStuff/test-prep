@@ -174,7 +174,7 @@ export function QuestionAttempt({ question, testId, previousResponse }: Question
             )}
           >
             <Bookmark className={cn(
-              "h-5 w-5",
+              "h-6 w-6",
               isFavorited && "fill-current"
             )} />
           </Button>

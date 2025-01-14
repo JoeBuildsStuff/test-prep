@@ -149,8 +149,8 @@ export const columns: ColumnDef<Test>[] = [
           {score > 0 ? (
             <Link href={`/workspace/history?test_id=${testId}`}>
               <Badge variant={
-                score >= 70 ? "green" : 
-                score >= 50 ? "yellow" : 
+                score >= 85 ? "green" : 
+                score >= 70 ? "yellow" : 
                 "red"
               }>
                 {Math.round(score)}%
