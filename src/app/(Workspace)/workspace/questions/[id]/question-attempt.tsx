@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Check } from "lucide-react"
+import { Check, Star } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { createClient } from '@/utils/supabase/client'
@@ -23,6 +23,7 @@ interface QuestionAttemptProps {
     section: string | null
     subsection: string | null
     tags?: string[]
+    is_favorited?: boolean
   }
   testId?: string
   previousResponse?: {
@@ -41,6 +42,7 @@ export function QuestionAttempt({ question, testId, previousResponse }: Question
   const [isSubmitted, setIsSubmitted] = useState(!!previousResponse)
   const [isCorrect, setIsCorrect] = useState(previousResponse?.is_correct || false)
   const [attemptError, setAttemptError] = useState<string | null>(null)
+  const [isFavorited, setIsFavorited] = useState(question.is_favorited || false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -129,10 +131,54 @@ export function QuestionAttempt({ question, testId, previousResponse }: Question
     }
   }
 
+  const handleFavoriteToggle = async () => {
+    try {
+      if (isFavorited) {
+        // Remove from favorites
+        const { error } = await supabase
+          .from('test_prep_user_favorites')
+          .delete()
+          .eq('question_id', question.id)
+
+        if (error) throw error
+        setIsFavorited(false)
+      } else {
+        // Add to favorites
+        const { error } = await supabase
+          .from('test_prep_user_favorites')
+          .insert({
+            question_id: question.id
+          })
+
+        if (error) throw error
+        setIsFavorited(true)
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error)
+    }
+  }
+
   return (
     <Card className='prose dark:prose-invert'>
       <CardHeader>
+        <div className="flex justify-between items-start">
           {question.question}
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={handleFavoriteToggle}
+            className={cn(
+              "ml-2",
+              isFavorited && "text-yellow-500 hover:text-yellow-600",
+              !isFavorited && "text-gray-400 hover:text-gray-500"
+            )}
+          >
+            <Star className={cn(
+              "h-5 w-5",
+              isFavorited && "fill-current"
+            )} />
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4">

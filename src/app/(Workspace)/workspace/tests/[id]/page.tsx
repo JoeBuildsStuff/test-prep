@@ -20,6 +20,7 @@ interface TestQuestion {
         selected_answers: string[]
         is_correct: boolean
     }>
+    is_favorited: boolean
 }
 
 // Add interface for raw data from Supabase
@@ -37,6 +38,9 @@ interface RawTestQuestion {
     test_prep_user_responses: Array<{
         selected_answers: string[]
         is_correct: boolean
+    }>
+    test_prep_user_favorites: Array<{
+        id: string
     }>
 }
 
@@ -76,7 +80,8 @@ export default async function TestPage({
                 test_prep_user_responses(
                     selected_answers, 
                     is_correct
-                )
+                ),
+                test_prep_user_favorites(id)
             )
         )
     `)
@@ -100,7 +105,8 @@ export default async function TestPage({
                 section: rawQuestion.section?.name || null,
                 subsection: rawQuestion.subsection?.name || null,
                 tags: rawQuestion.tags?.map(({ tag }) => tag.name) || [],
-                test_prep_user_responses: rawQuestion.test_prep_user_responses || []
+                test_prep_user_responses: rawQuestion.test_prep_user_responses || [],
+                is_favorited: (rawQuestion.test_prep_user_favorites?.length ?? 0) > 0
             }
             return question
         })
