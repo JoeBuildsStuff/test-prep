@@ -51,8 +51,9 @@ export const columns: ColumnDef<UserResponse>[] = [
     cell: ({ row }) => {
       const date = row.getValue("created_at") as string | null
       return (
-        <div className="w-fit">
-          {date ? format(new Date(date), "PPp") : "-"}
+        <div className="w-fit items-center justify-center">
+          {date ? format(new Date(date), "MMM dd") : "-"}
+          <Badge variant="outline" className="ml-2">{date ? format(new Date(date), "h:mm a") : "-"}</Badge>
         </div>
       )
     },
