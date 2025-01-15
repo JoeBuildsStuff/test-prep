@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Bookmark, Check } from "lucide-react"
+import { Check, Flag } from "lucide-react"
 import { useRouter } from "next/navigation"
 import { cn } from "@/lib/utils"
 import { createClient } from '@/utils/supabase/client'
@@ -158,6 +158,8 @@ export function QuestionAttempt({ question, testId, previousResponse }: Question
     }
   }
 
+  // yellow: "border-transparent bg-yellow-50 text-yellow-800 dark:text-yellow-400 dark:bg-yellow-900/20 ring-1 ring-inset ring-yellow-600/20 dark:ring-yellow-600/30",
+
   return (
     <Card className='prose dark:prose-invert'>
       <CardHeader>
@@ -165,18 +167,18 @@ export function QuestionAttempt({ question, testId, previousResponse }: Question
           {question.question}
           <Button
             variant="ghost"
-          
             onClick={handleFavoriteToggle}
             className={cn(
               "ml-2",
-              isFavorited && "text-yellow-500 hover:text-yellow-600",
-              !isFavorited && "text-gray-400 hover:text-gray-500"
+              isFavorited && "border-transparent hover:bg-yellow-100 bg-yellow-100  dark:bg-yellow-900/20 ring-1 ring-inset ring-yellow-600/20 dark:ring-yellow-600/30"
             )}
           >
-            <Bookmark className={cn(
-              "h-6 w-6",
-              isFavorited && "fill-current"
-            )} />
+            <Flag 
+              strokeWidth={1}
+              className={cn(
+                "h-5 w-5",
+                isFavorited ? "fill-yellow-100 text-yellow-700/50 dark:text-yellow-600 dark:fill-yellow-900/20 " : "text-gray-400"
+              )} />
           </Button>
         </div>
       </CardHeader>

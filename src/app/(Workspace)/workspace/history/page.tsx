@@ -17,25 +17,25 @@ export default async function HistoryPage(props: {
     const supabase = await createClient()
 
     const { data: userResponses, error } = await supabase
-        .from('test_prep_user_responses')
-        .select(`
-            id,
-            user_id,
-            question_id,
-            selected_answers,
-            is_correct,
-            attempt_number,
-            created_at,
-            test_id,
-            question:test_prep_questions (
-                title_short,
-                section:test_prep_sections(name),
-                subsection:test_prep_subsections(id, name)
-            )
-        `)
-        .order('id', { ascending: true })
-        .returns<Array<UserResponse>>()
-        
+    .from('test_prep_user_responses')
+    .select(`
+        id,
+        user_id,
+        question_id,
+        selected_answers,
+        is_correct,
+        attempt_number,
+        created_at,
+        test_id,
+        question:test_prep_questions (
+            title_short,
+            section:test_prep_sections(name),
+            subsection:test_prep_subsections(id, name)
+        )
+    `)
+    .order('id', { ascending: true })
+    .returns<Array<UserResponse>>();
+  
     if (error) {
         console.error('Error fetching questions:', error)
         return <div>Error fetching questions</div>
@@ -45,16 +45,29 @@ export default async function HistoryPage(props: {
         return <div>No user responses found</div>
     }
 
+    // Get favorites in a separate query
+    //TODO: Is there a way to get the favorites in the same query as the user responses?
+    const { data: favorites } = await supabase
+    .from('test_prep_user_favorites')
+    .select('question_id')
+    .eq('user_id', userResponses?.[0]?.user_id);
+
+    // Combine the data
+    const userResponsesWithFavorites = userResponses?.map(response => ({
+    ...response,
+    favorite: favorites?.some(f => f.question_id === response.question_id) ?? false
+    }));
+
     // Calculate statistics
-    const totalResponses = userResponses?.length || 0
-    const correctResponses = userResponses?.filter(r => r.is_correct).length || 0
+    const totalResponses = userResponsesWithFavorites?.length || 0
+    const correctResponses = userResponsesWithFavorites?.filter(r => r.is_correct).length || 0
     const accuracy = totalResponses ? Math.round((correctResponses / totalResponses) * 100) : 0
-    const uniqueQuestions = new Set(userResponses?.map(r => r.question_id)).size
+    const uniqueQuestions = new Set(userResponsesWithFavorites?.map(r => r.question_id)).size
 
     return (
         <div className="space-y-6">
             <div className="flex items-center justify-between">
-                <h1 className="text-3xl font-bold">Question History</h1>
+                <h1 className="text-3xl font-bold">Response History</h1>
             </div>
 
             {/* Stats Overview */}
@@ -97,7 +110,7 @@ export default async function HistoryPage(props: {
             </div>
 
             <DataTable 
-                data={userResponses} 
+                data={userResponsesWithFavorites} 
                 columns={columns} 
                 initialFilters={[
                     ...(section ? [{
@@ -119,6 +132,10 @@ export default async function HistoryPage(props: {
                     ...(questionId ? [{
                         id: 'question_id',
                         value: [questionId]
+                    }] : []),
+                    ...(searchParams.favorite ? [{
+                        id: 'favorite',
+                        value: [searchParams.favorite === 'true' ? 'true' : 'false']
                     }] : [])
                 ]}
             />

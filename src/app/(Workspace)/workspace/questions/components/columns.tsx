@@ -1,13 +1,64 @@
 "use client"
 
-import { ColumnDef } from "@tanstack/react-table"
+import { ColumnDef, Row } from "@tanstack/react-table"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
+import { Flag } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { createClient } from '@/utils/supabase/client'
+import { useState } from 'react'
 
 import { Question } from "./schema"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
+
+function FavoriteCell({ row }: { row: Row<Question> }) {
+  const [isFavorited, setIsFavorited] = useState(row.getValue("favorite") as boolean)
+  const questionId = row.getValue("id") as string
+  
+  const handleFavoriteToggle = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    
+    const supabase = createClient()
+    try {
+      if (isFavorited) {
+        const { error } = await supabase
+          .from('test_prep_user_favorites')
+          .delete()
+          .eq('question_id', questionId)
+
+        if (error) throw error
+        setIsFavorited(false)
+      } else {
+        const { error } = await supabase
+          .from('test_prep_user_favorites')
+          .insert({
+            question_id: questionId
+          })
+
+        if (error) throw error
+        setIsFavorited(true)
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error)
+    }
+  }
+
+  return (
+    <div className="w-fit">
+      <Flag 
+        strokeWidth={0.75}
+        className={cn(
+          "h-5 w-5 cursor-pointer",
+          isFavorited ? "fill-yellow-300/40 text-yellow-700/50 dark:text-yellow-200 dark:fill-yellow-400/20" : "text-gray-400"
+        )}
+        onClick={handleFavoriteToggle}
+      />
+    </div>
+  )
+}
 
 export const columns: ColumnDef<Question>[] = [
   {
@@ -163,6 +214,17 @@ export const columns: ColumnDef<Question>[] = [
           )}
         </div>
       )
+    },
+  },
+  {
+    accessorKey: "favorite",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Flagged" />
+    ),
+    cell: ({ row }) => <FavoriteCell row={row} />,
+    filterFn: (row, id, value) => {
+      const cellValue = row.getValue(id) as boolean
+      return value.includes(String(cellValue))
     },
   },
   {

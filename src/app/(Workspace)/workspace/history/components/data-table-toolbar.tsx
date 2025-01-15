@@ -117,6 +117,16 @@ export function DataTableToolbar<TData>({
             ]}
           />
         )}
+        {table.getColumn("favorite") && (
+          <DataTableFacetedFilter
+            column={table.getColumn("favorite")}
+            title="Favorites"
+            options={[
+              { value: "true", label: "Favorited" },
+              { value: "false", label: "Not Favorited" },
+            ]}
+          />
+        )}
         {isFiltered && (
           <Button
             variant="ghost"

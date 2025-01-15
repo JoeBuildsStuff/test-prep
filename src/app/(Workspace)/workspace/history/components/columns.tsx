@@ -1,14 +1,66 @@
 "use client"
 
-import { ColumnDef } from "@tanstack/react-table"
+import { ColumnDef, Row } from "@tanstack/react-table"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
+import { Flag } from "lucide-react"
+import { cn } from "@/lib/utils"
+import { createClient } from '@/utils/supabase/client'
+import { useState } from 'react'
 
 import { UserResponse } from "./schema"
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
 import { format } from "date-fns"
+
+function FavoriteCell({ row }: { row: Row<UserResponse> }) {
+  const [isFavorited, setIsFavorited] = useState(row.getValue("favorite") as boolean)
+  const questionId = row.original.question_id
+  
+  const handleFavoriteToggle = async (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    
+    const supabase = createClient()
+    try {
+      if (isFavorited) {
+        const { error } = await supabase
+          .from('test_prep_user_favorites')
+          .delete()
+          .eq('question_id', questionId)
+
+        if (error) throw error
+        setIsFavorited(false)
+      } else {
+        const { error } = await supabase
+          .from('test_prep_user_favorites')
+          .insert({
+            question_id: questionId
+          })
+
+        if (error) throw error
+        setIsFavorited(true)
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error)
+    }
+  }
+
+  return (
+    <div className="w-fit">
+      <Flag 
+        strokeWidth={0.75}
+        className={cn(
+          "h-5 w-5 cursor-pointer",
+          isFavorited ? "fill-yellow-300/40 text-yellow-700/50 dark:text-yellow-200 dark:fill-yellow-400/20" : "text-gray-400"
+        )}
+        onClick={handleFavoriteToggle}
+      />
+    </div>
+  )
+}
+
 export const columns: ColumnDef<UserResponse>[] = [
   {
     id: "select",
@@ -51,9 +103,8 @@ export const columns: ColumnDef<UserResponse>[] = [
     cell: ({ row }) => {
       const date = row.getValue("created_at") as string | null
       return (
-        <div className="w-fit items-center justify-center">
-          {date ? format(new Date(date), "MMM dd") : "-"}
-          <Badge variant="outline" className="ml-2">{date ? format(new Date(date), "h:mm a") : "-"}</Badge>
+        <div className="w-fit">
+          {date ? format(new Date(date), "MMM dd @ h:mm a") : "-"}
         </div>
       )
     },
@@ -187,6 +238,17 @@ export const columns: ColumnDef<UserResponse>[] = [
           {row.getValue("attempt_number")}
         </div>
       )
+    },
+  },
+  {
+    accessorKey: "favorite",
+    header: ({ column }) => (
+      <DataTableColumnHeader column={column} title="Flagged" />
+    ),
+    cell: ({ row }) => <FavoriteCell row={row} />,
+    filterFn: (row, id, value) => {
+      const cellValue = row.getValue(id) as boolean
+      return value.includes(String(cellValue))
     },
   },
   {

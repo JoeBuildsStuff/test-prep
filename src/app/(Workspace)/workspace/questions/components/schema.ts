@@ -11,6 +11,7 @@ export const QuestionSchema = z.object({
   tags: z.string(),
   attempts: z.number(),
   accuracy: z.number(),
+  favorite: z.boolean()
 })
 
 export type Question = z.infer<typeof QuestionSchema>

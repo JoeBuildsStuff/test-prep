@@ -30,13 +30,15 @@ export default async function QuestionPage({
       subsection:test_prep_subsections(name),
       tags:test_prep_question_tags(
         tag:test_prep_tags(name)
-      )
+      ),
+      test_prep_user_favorites(id)
     `)
     .eq('id', id)
     .single<TestPrepQuestion & {
       section: { name: string } | null;
       subsection: { name: string } | null;
       tags: { tag: { name: string } }[];
+      test_prep_user_favorites: { id: string }[];
     }>()
 
   if (error || !question) {
@@ -57,7 +59,8 @@ export default async function QuestionPage({
     ...question,
     section: question.section?.name || null,
     subsection: question.subsection?.name || null,
-    tags: question.tags.map(({ tag }) => tag.name)
+    tags: question.tags.map(({ tag }) => tag.name),
+    is_favorited: (question.test_prep_user_favorites?.length ?? 0) > 0
   }
 
   return (

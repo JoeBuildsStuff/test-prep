@@ -49,6 +49,7 @@ export function DataTable<TData, TValue>({
       selected_answers: false,
       "question.section.name": false,
       "question.subsection.name": false,
+      attempt_number: false,
     })
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
     initialFilters

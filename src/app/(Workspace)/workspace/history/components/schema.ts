@@ -24,7 +24,8 @@ export const UserResponseSchema = z.object({
   attempt_number: z.number(),
   created_at: z.string(),
   test_id: z.string().nullable(),
-  question: QuestionSchema
+  question: QuestionSchema,
+  favorite: z.boolean()
 })
 
 export type UserResponse = z.infer<typeof UserResponseSchema>

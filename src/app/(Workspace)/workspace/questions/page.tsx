@@ -51,7 +51,12 @@ export default async function QuestionBankPage(props: {
         return <div>No questions found</div>
     }
 
-    // Transform the data to match the DataTable's expected format
+    // Get user favorites
+    const { data: favorites } = await supabase
+        .from('test_prep_user_favorites')
+        .select('question_id');
+
+    // Transform the data including favorites
     const transformedQuestions = questions.map(q => ({
         id: q.id,
         type: q.type,
@@ -65,7 +70,8 @@ export default async function QuestionBankPage(props: {
             : 0,
         lastResponse: q.user_responses?.sort((a, b) => 
             new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
-        )[0] ?? null
+        )[0] ?? null,
+        favorite: favorites?.some(f => f.question_id === q.id) ?? false
     }))
 
     return (
@@ -120,6 +126,10 @@ export default async function QuestionBankPage(props: {
                     ...(questionId ? [{
                         id: 'id',
                         value: [questionId]
+                    }] : []),
+                    ...(searchParams.favorite ? [{
+                        id: 'favorite',
+                        value: [searchParams.favorite === 'true' ? 'true' : 'false']
                     }] : [])
                 ]}
             />
