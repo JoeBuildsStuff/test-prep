@@ -1,15 +1,6 @@
 import { redirect } from 'next/navigation'
-import { createClient } from '@/utils/supabase/server'
 
-
-export default async function WorkspacePage() {
-  const supabase = await createClient()
-  
-  const { data, error } = await supabase.auth.getUser()
-  
-  if (error || !data?.user) {
-    redirect('/login')
-  }
-  
-  redirect('/workspace/dashboard')
+export default function WorkspacePage() {
+  // Redirect to the default certification (ML Engineer)
+  redirect('/ml-engineer/dashboard')
 }

@@ -1,5 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import Link from 'next/link'
+import { notFound } from 'next/navigation'
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
@@ -12,8 +13,39 @@ import {
 } from "@/components/ui/table"
 import { Badge } from "@/components/ui/badge"
 
-//fetch sections
-async function fetchUserResponses() {
+// Add function to get certification by certName
+async function getCertificationByCertName(certName: string) {
+  const supabase = await createClient()
+  
+  // Map certName to certification code
+  const certNameToCode: Record<string, string> = {
+    'ml-engineer': 'MLA-C01',
+    'cloud-practitioner': 'CLF-C02',
+    // Add more mappings as needed
+  }
+  
+  const certCode = certNameToCode[certName]
+  
+  if (!certCode) {
+    return null
+  }
+  
+  const { data: certification, error } = await supabase
+    .schema('test_prep')
+    .from('certifications')
+    .select('*')
+    .eq('code', certCode)
+    .single()
+    
+  if (error || !certification) {
+    return null
+  }
+  
+  return certification
+}
+
+//fetch sections - updated to filter by certification
+async function fetchUserResponses(certificationId: string) {
   const supabase = await createClient()
 
   const { data: userResponses, error } = await supabase
@@ -21,13 +53,14 @@ async function fetchUserResponses() {
     .from('user_responses')
     .select(`
       *,
-      question:questions (
+      question:questions!inner (
         id,
         section:sections(name),
         subsection:subsections(id, name)
       ),
       is_correct
     `)
+    .eq('questions.certification_id', certificationId)
     .returns<Array<{
       id: string;
       is_correct: boolean;
@@ -46,7 +79,7 @@ async function fetchUserResponses() {
   return userResponses
 }
 
-async function fetchAllSectionsAndSubsections() {
+async function fetchAllSectionsAndSubsections(certificationId: string) {
   const supabase = await createClient()
 
   const { data: sections, error } = await supabase
@@ -59,6 +92,7 @@ async function fetchAllSectionsAndSubsections() {
         name
       )
     `)
+    .eq('certification_id', certificationId)
 
   if (error) {
     console.error('Error fetching sections:', error)
@@ -68,10 +102,12 @@ async function fetchAllSectionsAndSubsections() {
   return sections 
 }
 
-async function fetchQuestionCounts() {
+async function fetchQuestionCounts(certificationId: string) {
   const supabase = await createClient()
 
-  const { data, error } = await supabase.schema('test_prep').rpc('get_question_counts_by_subsection');
+  const { data, error } = await supabase
+    .schema('test_prep')
+    .rpc('get_question_counts_by_subsection', { certification_id_param: certificationId });
 
   if (error) {
       console.error('Error fetching question counts:', error);
@@ -189,10 +225,24 @@ function calculateOverallStats(
   return { totalQuestions, totalAttempted, overallAccuracy };
 }
 
-export default async function DashboardPage() {
-  const userResponses = await fetchUserResponses()
-  const sections = await fetchAllSectionsAndSubsections()
-  const questionCounts = await fetchQuestionCounts()
+export default async function DashboardPage({
+  params,
+}: {
+  params: Promise<{ certName: string }>
+}) {
+  const { certName } = await params
+
+  const certification = await getCertificationByCertName(certName)
+
+  if (!certification) {
+    notFound()
+  }
+
+  const certificationId = certification.id
+
+  const userResponses = await fetchUserResponses(certificationId)
+  const sections = await fetchAllSectionsAndSubsections(certificationId)
+  const questionCounts = await fetchQuestionCounts(certificationId)
 
   // Add this right after the fetch calls
   const { totalQuestions, totalAttempted, overallAccuracy } = calculateOverallStats(
@@ -203,7 +253,12 @@ export default async function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Dashboard Overview</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-3xl font-bold">Dashboard Overview</h1>
+        <div className="text-sm text-muted-foreground">
+          {certification.provider} - {certification.name}
+        </div>
+      </div>
 
       {/* Add Stats Overview */}
       <div className="grid gap-4 md:grid-cols-4">
@@ -287,7 +342,7 @@ export default async function DashboardPage() {
                             <TableCell className="w-full">{subsection.name}</TableCell>
                             <TableCell className="text-right w-fit">
                               <Link 
-                                href={`/workspace/questions?section=${encodeURIComponent(section.name)}&subsection=${encodeURIComponent(subsection.name)}`}
+                                href={`/${certName}/questions?section=${encodeURIComponent(section.name)}&subsection=${encodeURIComponent(subsection.name)}`}
                                 className="hover:underline cursor-pointer"
                               >
                                 <Badge 
@@ -300,7 +355,7 @@ export default async function DashboardPage() {
                             </TableCell>
                             <TableCell className="text-right w-fit">
                               {answeredCount > 0 ? (
-                                <Link href={`/workspace/history?section=${encodeURIComponent(section.name)}&subsection=${encodeURIComponent(subsection.name)}`}>
+                                <Link href={`/${certName}/history?section=${encodeURIComponent(section.name)}&subsection=${encodeURIComponent(subsection.name)}`}>
                                   <Badge 
                                     className="cursor-pointer hover:opacity-80"
                                     variant="outline"
@@ -312,7 +367,7 @@ export default async function DashboardPage() {
                             </TableCell>
                             <TableCell className="text-right w-fit">
                               {answeredCount > 0 ? (
-                                <Link href={`/workspace/history?section=${encodeURIComponent(section.name)}&subsection=${encodeURIComponent(subsection.name)}`}>
+                                <Link href={`/${certName}/history?section=${encodeURIComponent(section.name)}&subsection=${encodeURIComponent(subsection.name)}`}>
                                   <Badge 
                                     className="cursor-pointer hover:opacity-80"
                                     variant={
@@ -333,7 +388,7 @@ export default async function DashboardPage() {
                         <TableCell className="w-full">Section Total</TableCell>
                         <TableCell className="text-right w-fit">
                           <Link 
-                            href={`/workspace/questions?section=${encodeURIComponent(section.name)}`}
+                            href={`/${certName}/questions?section=${encodeURIComponent(section.name)}`}
                             className="hover:underline cursor-pointer"
                           ><Badge 
                           className="cursor-pointer hover:opacity-80"
@@ -345,7 +400,7 @@ export default async function DashboardPage() {
                         </TableCell>
                         <TableCell className="text-right w-fit">
                           {totalAttempted > 0 ? (
-                            <Link href={`/workspace/history?section=${encodeURIComponent(section.name)}`}>
+                            <Link href={`/${certName}/history?section=${encodeURIComponent(section.name)}`}>
                               <Badge 
                                 className="cursor-pointer hover:opacity-80"
                                 variant="outline"
@@ -357,7 +412,7 @@ export default async function DashboardPage() {
                         </TableCell>
                         <TableCell className="text-right w-fit">
                           {totalAttempted > 0 ? (
-                            <Link href={`/workspace/history?section=${encodeURIComponent(section.name)}`}>
+                            <Link href={`/${certName}/history?section=${encodeURIComponent(section.name)}`}>
                               <Badge 
                                 className="cursor-pointer hover:opacity-80"
                                 variant={

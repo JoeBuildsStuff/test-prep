@@ -3,18 +3,69 @@ import { DataTable } from './components/data-table'
 import { columns } from './components/columns'
 import { UserResponse } from './components/schema'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card'
+import { notFound } from 'next/navigation'
 
-export default async function HistoryPage(props: {
+// Add function to get certification by certName
+async function getCertificationByCertName(certName: string) {
+  const supabase = await createClient()
+  
+  // Map certName to certification code
+  const certNameToCode: Record<string, string> = {
+    'ml-engineer': 'MLA-C01',
+    'cloud-practitioner': 'CLF-C02',
+    // Add more mappings as needed
+  }
+  
+  const certCode = certNameToCode[certName]
+  
+  if (!certCode) {
+    return null
+  }
+  
+  const { data: certification, error } = await supabase
+    .schema('test_prep')
+    .from('certifications')
+    .select('*')
+    .eq('code', certCode)
+    .single()
+    
+  if (error || !certification) {
+    return null
+  }
+  
+  return certification
+}
+
+export default async function HistoryPage({
+    params,
+    searchParams: searchParamsPromise
+}: {
+    params: Promise<{ certName: string }>
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
-    const searchParams = await props.searchParams
+    const { certName } = await params
+    const searchParams = await searchParamsPromise
+    
     const section = searchParams.section as string | undefined
     const subsection = searchParams.subsection as string | undefined
     const testId = searchParams.test_id as string | undefined
     const isCorrect = searchParams.is_correct as string | undefined
     const questionId = searchParams.question_id as string | undefined
 
+    // Get certification
+    const certification = await getCertificationByCertName(certName)
+    
+    if (!certification) {
+        notFound()
+    }
+
     const supabase = await createClient()
+
+    // Get current user
+    const { data: { user }, error: userError } = await supabase.auth.getUser()
+    if (userError || !user) {
+        return <div>Error: User not authenticated</div>
+    }
 
     const { data: userResponses, error } = await supabase
     .schema('test_prep')
@@ -28,12 +79,15 @@ export default async function HistoryPage(props: {
         attempt_number,
         created_at,
         test_id,
-        question:questions (
+        question:questions!inner (
             title_short,
+            certification_id,
             section:sections(name),
             subsection:subsections(id, name)
         )
     `)
+    .eq('user_id', user.id)
+    .eq('question.certification_id', certification.id)
     .order('id', { ascending: true })
     .returns<Array<UserResponse>>();
   
@@ -52,7 +106,7 @@ export default async function HistoryPage(props: {
     .schema('test_prep')
     .from('user_favorites')
     .select('question_id')
-    .eq('user_id', userResponses?.[0]?.user_id);
+    .eq('user_id', user.id);
 
     // Combine the data
     const userResponsesWithFavorites = userResponses?.map(response => ({
@@ -70,6 +124,9 @@ export default async function HistoryPage(props: {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <h1 className="text-3xl font-bold">Response History</h1>
+                <div className="text-sm text-muted-foreground">
+                    {certification.provider} - {certification.name}
+                </div>
             </div>
 
             {/* Stats Overview */}

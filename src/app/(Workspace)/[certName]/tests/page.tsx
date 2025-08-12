@@ -1,5 +1,6 @@
 import { createClient } from '@/utils/supabase/server'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { notFound } from 'next/navigation'
 
 import { Target, TrendingUp, CheckCircle2, ListChecks } from "lucide-react"
 
@@ -12,19 +13,59 @@ interface TestUserResponse {
     is_correct: boolean
 }
 
+// Add function to get certification by certName
+async function getCertificationByCertName(certName: string) {
+  const supabase = await createClient()
+  
+  // Map certName to certification code
+  const certNameToCode: Record<string, string> = {
+    'ml-engineer': 'MLA-C01',
+    'cloud-practitioner': 'CLF-C02',
+    // Add more mappings as needed
+  }
+  
+  const certCode = certNameToCode[certName]
+  
+  if (!certCode) {
+    return null
+  }
+  
+  const { data: certification, error } = await supabase
+    .schema('test_prep')
+    .from('certifications')
+    .select('*')
+    .eq('code', certCode)
+    .single()
+    
+  if (error || !certification) {
+    return null
+  }
+  
+  return certification
+}
+
 export default async function TestsPage({
-    searchParams
+    params,
+    searchParams: searchParamsPromise
 }: {
+    params: Promise<{ certName: string }>
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
-    // Await the searchParams
-    const params = await searchParams
-    const testId = params.test_id as string | undefined
+    // Await the params and searchParams
+    const { certName } = await params
+    const searchParams = await searchParamsPromise
+    const testId = searchParams.test_id as string | undefined
+
+    // Get certification
+    const certification = await getCertificationByCertName(certName)
+    
+    if (!certification) {
+        notFound()
+    }
 
     const supabase = await createClient()
 
-    // Fetch user's tests with questions and responses
-    // TODO: What is questions_2?
+    // Fetch user's tests with questions and responses for the specific certification
     const { data: testsData, error: testsError } = await supabase
         .schema('test_prep')
         .from('tests')
@@ -39,6 +80,7 @@ export default async function TestsPage({
             ),
             user_responses(is_correct)
         `)
+        .eq('certification_id', certification.id)
         .order('created_at', { ascending: false })
 
     if (testsError) {
@@ -74,9 +116,13 @@ export default async function TestsPage({
 
     return (
         <div className="space-y-6">
-                        <div className="flex items-center justify-between">
+            <div className="flex items-center justify-between">
                 <h1 className="text-3xl font-bold">Practice Tests</h1>
+                <div className="text-sm text-muted-foreground">
+                    {certification.provider} - {certification.name}
+                </div>
             </div>
+            
             {/* Performance Overview */}
             <div className="grid gap-4 md:grid-cols-4">
                 {[

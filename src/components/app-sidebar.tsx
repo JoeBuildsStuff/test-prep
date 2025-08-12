@@ -2,16 +2,16 @@
 
 import * as React from "react"
 import {
-  BookOpen,
   CircleHelp,
   Clock,
   File,
   PieChart,
 } from "lucide-react"
+import { usePathname } from 'next/navigation'
 
 import { NavMain } from "@/components/nav-main"
 import { NavUser } from "@/components/nav-user"
-import { TeamSwitcher } from "@/components/team-switcher"
+import { CertificationSwitcher } from "@/components/certification-switcher"
 import {
   Sidebar,
   SidebarContent,
@@ -21,41 +21,33 @@ import {
 } from "@/components/ui/sidebar"
 
 import { User } from '@supabase/supabase-js'
-import { usePathname } from 'next/navigation'
 
 // Add interface for the user data
 interface AppSidebarProps extends React.ComponentProps<typeof Sidebar> {
   userData: User;
 }
 
-// Update the data object
+// Update the data object to work with dynamic routes
 const data = {
-  teams: [
-    {
-      name: "Test Prep Pro",
-      logo: BookOpen,
-      plan: "Enterprise",
-    },
-  ],
   navMain: [
     {
       title: "Dashboard",
-      url: "/workspace/dashboard",
+      url: "dashboard",
       icon: PieChart,
     },
     {
       title: "Questions",
-      url: "/workspace/questions",
+      url: "questions",
       icon: CircleHelp,
     },
     {
       title: "Tests",
-      url: "/workspace/tests",
+      url: "tests",
       icon: File,
     },
     {
       title: "History",
-      url: "/workspace/history",
+      url: "history",
       icon: Clock,
     },
   ],
@@ -64,11 +56,22 @@ const data = {
 export function AppSidebar({ userData, ...props }: AppSidebarProps) {
   const pathname = usePathname()
 
-  // Update the data object with active states based on pathname
-  const navMainWithActive = data.navMain.map(item => ({
-    ...item,
-    isActive: pathname.startsWith(item.url),
-  }))
+  // Extract the current certification and page from pathname
+  const pathParts = pathname.split('/')
+  const currentCert = pathParts[1] || 'ml-engineer' // Default to ml-engineer
+  const currentPage = pathParts[2] || 'dashboard' // Default to dashboard
+
+  // Update the data object with active states and dynamic URLs
+  const navMainWithActive = data.navMain.map(item => {
+    const isActive = currentPage === item.url
+    const url = `/${currentCert}/${item.url}`
+    
+    return {
+      ...item,
+      url,
+      isActive,
+    }
+  })
 
   const user = {
     name: userData.user_metadata?.full_name || userData.user_metadata?.name || userData.email?.split('@')[0] || 'User',
@@ -79,7 +82,7 @@ export function AppSidebar({ userData, ...props }: AppSidebarProps) {
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
-        <TeamSwitcher teams={data.teams} />
+        <CertificationSwitcher />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={navMainWithActive} />

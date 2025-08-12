@@ -2,14 +2,59 @@ import { createClient } from '@/utils/supabase/server'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { DataTable } from './components/data-table'
 import { columns } from './components/columns'
+import { notFound } from 'next/navigation'
 
-export default async function QuestionBankPage(props: {
+// Add function to get certification by certName
+async function getCertificationByCertName(certName: string) {
+  const supabase = await createClient()
+  
+  // Map certName to certification code
+  const certNameToCode: Record<string, string> = {
+    'ml-engineer': 'MLA-C01',
+    'cloud-practitioner': 'CLF-C02',
+    // Add more mappings as needed
+  }
+  
+  const certCode = certNameToCode[certName]
+  
+  if (!certCode) {
+    return null
+  }
+  
+  const { data: certification, error } = await supabase
+    .schema('test_prep')
+    .from('certifications')
+    .select('*')
+    .eq('code', certCode)
+    .single()
+    
+  if (error || !certification) {
+    return null
+  }
+  
+  return certification
+}
+
+export default async function QuestionBankPage({
+    params,
+    searchParams: searchParamsPromise
+}: {
+    params: Promise<{ certName: string }>
     searchParams: Promise<{ [key: string]: string | string[] | undefined }>
 }) {
-    const searchParams = await props.searchParams
+    const { certName } = await params
+    const searchParams = await searchParamsPromise
+    
     const section = searchParams.section as string | undefined
     const subsection = searchParams.subsection as string | undefined
     const questionId = searchParams.id as string | undefined
+
+    // Get certification
+    const certification = await getCertificationByCertName(certName)
+    
+    if (!certification) {
+        notFound()
+    }
 
     const supabase = await createClient()
     const { data: questions, error } = await supabase
@@ -21,13 +66,16 @@ export default async function QuestionBankPage(props: {
             title_short,
             section:sections(name),
             subsection:subsections(name),
-            tags:tags(name),
+            tags:question_tags(
+                tag:tags(name)
+            ),
             user_responses:user_responses(
                 is_correct,
                 created_at,
                 selected_answers
             )
         `)
+        .eq('certification_id', certification.id)
         .order('id', { ascending: true })
         .returns<Array<{
             id: string;
@@ -35,7 +83,7 @@ export default async function QuestionBankPage(props: {
             title_short: string;
             section: { name: string } | null;
             subsection: { name: string } | null;
-            tags: { name: string }[] | null;
+            tags: Array<{ tag: { name: string } }> | null;
             user_responses: Array<{
                 is_correct: boolean;
                 created_at: string;
@@ -65,7 +113,7 @@ export default async function QuestionBankPage(props: {
         title: q.title_short,
         section: q.section?.name ?? '',
         subsection: q.subsection?.name ?? '',
-        tags: q.tags?.map(t => t.name).join(', ') ?? '',
+        tags: q.tags?.map(t => t.tag.name).join(', ') ?? '',
         attempts: q.user_responses?.length ?? 0,
         accuracy: q.user_responses?.length 
             ? Math.round((q.user_responses.filter(r => r.is_correct).length / q.user_responses.length) * 100)
@@ -80,6 +128,9 @@ export default async function QuestionBankPage(props: {
         <div className="space-y-6">
             <div className="flex items-center justify-between">
                 <h1 className="text-3xl font-bold">Question Bank</h1>
+                <div className="text-sm text-muted-foreground">
+                    {certification.provider} - {certification.name}
+                </div>
             </div>
 
             {/* Stats Overview */}
@@ -98,7 +149,7 @@ export default async function QuestionBankPage(props: {
                         label: "Tags", 
                         value: new Set(
                             questions
-                                .flatMap(q => q.tags?.map(tag => tag.name) || [])
+                                .flatMap(q => q.tags?.map(tag => tag.tag.name) || [])
                         ).size 
                     },
                 ].map((stat) => (

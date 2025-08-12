@@ -150,7 +150,7 @@ export const columns: ColumnDef<UserResponse>[] = [
     },
   },
   {
-    accessorFn: (row) => row.question.title_short,
+    accessorFn: (row) => row.question?.title_short || '',
     id: "question.title_short",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Topic" />
@@ -158,13 +158,13 @@ export const columns: ColumnDef<UserResponse>[] = [
     cell: ({ row }) => {
       return (
         <div className="w-fit">
-          {row.original.question.title_short}
+          {row.original.question?.title_short || '-'}
         </div>
       )
     },
   },
   {
-    accessorFn: (row) => row.question.section.name,
+    accessorFn: (row) => row.question?.section?.name || '',
     id: "question.section.name",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Section" />
@@ -172,13 +172,13 @@ export const columns: ColumnDef<UserResponse>[] = [
     cell: ({ row }) => {
       return (
         <div className="w-fit">
-          {row.original.question.section.name}
+          {row.original.question?.section?.name || '-'}
         </div>
       )
     },
   },
   {
-    accessorFn: (row) => row.question.subsection.name,
+    accessorFn: (row) => row.question?.subsection?.name || '',
     id: "question.subsection.name",
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Subsection" />
@@ -186,7 +186,7 @@ export const columns: ColumnDef<UserResponse>[] = [
     cell: ({ row }) => {
       return (
         <div className="w-fit">
-          {row.original.question.subsection.name}
+          {row.original.question?.subsection?.name || '-'}
         </div>
       )
     },
