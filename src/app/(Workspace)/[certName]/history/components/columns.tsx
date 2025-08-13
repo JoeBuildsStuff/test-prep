@@ -8,6 +8,7 @@ import { Flag } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { createClient } from '@/utils/supabase/client'
 import { useState } from 'react'
+import { usePathname } from 'next/navigation'
 
 import { UserResponse } from "./schema"
 import { DataTableColumnHeader } from "./data-table-column-header"
@@ -60,6 +61,19 @@ function FavoriteCell({ row }: { row: Row<UserResponse> }) {
         onClick={handleFavoriteToggle}
       />
     </div>
+  )
+}
+
+function DynamicTestLink({ testId }: { testId: string }) {
+  const pathname = usePathname()
+  const currentCert = pathname.split('/')[1] || 'ml-engineer'
+  
+  return (
+    <Link href={`/${currentCert}/tests?test_id=${testId}`}>
+      <Badge variant="outline">
+        {testId ? `${testId.slice(0, 3)}...${testId.slice(-3)}` : ""}
+      </Badge>
+    </Link>
   )
 }
 
@@ -139,11 +153,7 @@ export const columns: ColumnDef<UserResponse>[] = [
       return (
         <div className="w-fit">
           {testId ? (
-            <Link href={`/workspace/tests?test_id=${testId}`}>
-              <Badge variant="outline">
-                {testId ? `${testId.slice(0, 3)}...${testId.slice(-3)}` : ""}
-              </Badge>
-            </Link>
+            <DynamicTestLink testId={testId} />
           ) : "-"}
         </div>
       )

@@ -4,9 +4,9 @@ import { notFound } from 'next/navigation'
 
 import { Target, TrendingUp, CheckCircle2, ListChecks } from "lucide-react"
 
-import { DataTable } from "@/app/(Workspace)/workspace/tests/components/data-table"
-import { columns } from "@/app/(Workspace)/workspace/tests/components/columns"
-import { TestSchema, RawTestSchema, Test } from "@/app/(Workspace)/workspace/tests/components/schema"
+import { DataTable } from "@/app/(Workspace)/[certName]/tests/components/data-table"
+import { columns } from "@/app/(Workspace)/[certName]/tests/components/columns"
+import { TestSchema, RawTestSchema, Test } from "@/app/(Workspace)/[certName]/tests/components/schema"
 
 // Add interface for user response
 interface TestUserResponse {

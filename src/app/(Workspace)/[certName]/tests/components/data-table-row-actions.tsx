@@ -2,7 +2,7 @@
 
 import { Row } from "@tanstack/react-table"
 import { ExternalLink, MoreHorizontal } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -24,6 +24,8 @@ export function DataTableRowActions<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
   const router = useRouter()
+  const pathname = usePathname()
+  const currentCert = pathname.split('/')[1] || 'ml-engineer'
   const testId = row.getValue('id') as string
 
   return (
@@ -32,7 +34,7 @@ export function DataTableRowActions<TData>({
         variant="ghost"
         size="icon"
         className="h-8 w-8 p-0"
-        onClick={() => router.push(`/workspace/tests/${testId}`)}
+        onClick={() => router.push(`/${currentCert}/tests/${testId}`)}
       >
         <ExternalLink size={16}/>
       </Button>

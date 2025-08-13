@@ -5,11 +5,23 @@ import { Checkbox } from "@/components/ui/checkbox"
 import { format } from "date-fns"
 import { Badge } from "@/components/ui/badge"
 import Link from "next/link"
+import { usePathname } from 'next/navigation'
 
 import { DataTableColumnHeader } from "./data-table-column-header"
 import { DataTableRowActions } from "./data-table-row-actions"
 import { Test } from "./schema"
 
+function DynamicHistoryLink({ testId, children, isCorrect }: { testId: string; children: React.ReactNode; isCorrect?: boolean }) {
+  const pathname = usePathname()
+  const currentCert = pathname.split('/')[1] || 'ml-engineer'
+  const queryParam = isCorrect !== undefined ? `&is_correct=${isCorrect}` : ''
+  
+  return (
+    <Link href={`/${currentCert}/history?test_id=${testId}${queryParam}`}>
+      {children}
+    </Link>
+  )
+}
 
 export const columns: ColumnDef<Test>[] = [
   {
@@ -103,9 +115,9 @@ export const columns: ColumnDef<Test>[] = [
       const testId = row.getValue("id") as string
       return (
         <div className="w-fit">
-          <Link href={`/workspace/history?test_id=${testId}`}>
+          <DynamicHistoryLink testId={testId}>
             <Badge variant="outline">{completedQuestions}</Badge>
-          </Link>
+          </DynamicHistoryLink>
         </div>
       )
     },
@@ -120,9 +132,9 @@ export const columns: ColumnDef<Test>[] = [
       const testId = row.getValue("id") as string
       return (
         <div className="w-fit">
-          <Link href={`/workspace/history?test_id=${testId}&is_correct=true`}>
+          <DynamicHistoryLink testId={testId} isCorrect={true}>
             <Badge variant="outline">{correctCount}</Badge>
-          </Link>
+          </DynamicHistoryLink>
         </div>
       )
     },
@@ -137,9 +149,9 @@ export const columns: ColumnDef<Test>[] = [
       const testId = row.getValue("id") as string
       return (
         <div className="w-fit">
-          <Link href={`/workspace/history?test_id=${testId}&is_correct=false`}>
+          <DynamicHistoryLink testId={testId} isCorrect={false}>
             <Badge variant="outline">{wrongCount}</Badge>
-          </Link>
+          </DynamicHistoryLink>
         </div>
       )
     },
@@ -155,7 +167,7 @@ export const columns: ColumnDef<Test>[] = [
       return (
         <div className="w-fit">
           {score > 0 ? (
-            <Link href={`/workspace/history?test_id=${testId}`}>
+            <DynamicHistoryLink testId={testId}>
               <Badge variant={
                 score >= 85 ? "green" : 
                 score >= 70 ? "yellow" : 
@@ -163,7 +175,7 @@ export const columns: ColumnDef<Test>[] = [
               }>
                 {Math.round(score)}%
               </Badge>
-            </Link>
+            </DynamicHistoryLink>
           ) : null}
         </div>
       )

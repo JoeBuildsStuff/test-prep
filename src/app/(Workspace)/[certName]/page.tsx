@@ -1,8 +1,12 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 
-
-export default async function WorkspacePage() {
+export default async function WorkspacePage({
+  params
+}: {
+  params: Promise<{ certName: string }>
+}) {
+  const { certName } = await params
   const supabase = await createClient()
   
   const { data, error } = await supabase.auth.getUser()
@@ -11,5 +15,5 @@ export default async function WorkspacePage() {
     redirect('/login')
   }
   
-  redirect('/workspace/dashboard')
+  redirect(`/${certName}/dashboard`)
 }

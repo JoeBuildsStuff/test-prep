@@ -17,9 +17,9 @@ const getQuestionNumber = (id: string): number => {
 export default async function QuestionPage({
   params,
 }: {
-  params: Promise<{ id: string }>
+  params: Promise<{ id: string; certName: string }>
 }) {
-  const { id } = await params
+  const { id, certName } = await params
   const supabase = await createClient()
 
   const { data: question, error } = await supabase
@@ -68,7 +68,7 @@ export default async function QuestionPage({
   return (
     <div className="space-y-6 max-w-3xl mx-auto">
       <div className="flex items-center justify-between">
-        <Link href={prevId ? `/workspace/questions/${prevId}` : '#'}>
+        <Link href={prevId ? `/${certName}/questions/${prevId}` : '#'}>
           <Button 
             variant="outline" 
             size="sm"
@@ -78,7 +78,7 @@ export default async function QuestionPage({
             Previous
           </Button>
         </Link>
-        <Link href={nextExists ? `/workspace/questions/${nextId}` : '#'}>
+        <Link href={nextExists ? `/${certName}/questions/${nextId}` : '#'}>
           <Button 
             variant="outline" 
             size="sm"
@@ -97,7 +97,7 @@ export default async function QuestionPage({
       <QuestionAttempt question={questionForAttempt} />
 
       <div className="flex items-center justify-between">
-        <Link href={prevId ? `/workspace/questions/${prevId}` : '#'}>
+        <Link href={prevId ? `/${certName}/questions/${prevId}` : '#'}>
           <Button 
             variant="outline" 
             size="sm"
@@ -107,7 +107,7 @@ export default async function QuestionPage({
             Previous
           </Button>
         </Link>
-        <Link href={nextExists ? `/workspace/questions/${nextId}` : '#'}>
+        <Link href={nextExists ? `/${certName}/questions/${nextId}` : '#'}>
           <Button 
             variant="outline" 
             size="sm"

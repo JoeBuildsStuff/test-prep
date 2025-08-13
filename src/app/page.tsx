@@ -10,5 +10,5 @@ export default async function RootPage() {
     redirect('/login')
   }
   
-  redirect('/workspace/dashboard')
+  redirect('/ml-engineer/dashboard')
 }

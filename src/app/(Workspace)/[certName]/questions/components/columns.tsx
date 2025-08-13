@@ -8,6 +8,7 @@ import { Flag } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { createClient } from '@/utils/supabase/client'
 import { useState } from 'react'
+import { usePathname } from 'next/navigation'
 
 import { Question } from "./schema"
 import { DataTableColumnHeader } from "./data-table-column-header"
@@ -59,6 +60,17 @@ function FavoriteCell({ row }: { row: Row<Question> }) {
         onClick={handleFavoriteToggle}
       />
     </div>
+  )
+}
+
+function DynamicHistoryLink({ questionId, children }: { questionId: string; children: React.ReactNode }) {
+  const pathname = usePathname()
+  const currentCert = pathname.split('/')[1] || 'ml-engineer'
+  
+  return (
+    <Link href={`/${currentCert}/history?question_id=${questionId}`}>
+      {children}
+    </Link>
   )
 }
 
@@ -175,15 +187,15 @@ export const columns: ColumnDef<Question>[] = [
     ),
     cell: ({ row }) => {
       const attempts = row.getValue("attempts") as number
-      const questionId = row.getValue("id")
+      const questionId = row.getValue("id") as string
       return (
         <div className="w-fit">
           {attempts > 0 ? (
-            <Link href={`/workspace/history?question_id=${questionId}`}>
+            <DynamicHistoryLink questionId={questionId}>
               <Badge variant="outline" className="cursor-pointer hover:opacity-80">
                 {attempts}
               </Badge>
-            </Link>
+            </DynamicHistoryLink>
           ) : (
             <Badge variant="outline">-</Badge>
           )}
@@ -199,20 +211,20 @@ export const columns: ColumnDef<Question>[] = [
     cell: ({ row }) => {
       const attempts = row.getValue("attempts") as number
       const accuracy = row.getValue("accuracy") as number
-      const questionId = row.getValue("id")
+      const questionId = row.getValue("id") as string
       return (
         <div className="w-fit">
           {attempts === 0 ? (
             "-"
           ) : (
-            <Link href={`/workspace/history?question_id=${questionId}`}>
+            <DynamicHistoryLink questionId={questionId}>
               <Badge 
                 variant={accuracy >= 85 ? "green" : accuracy >= 70 ? "yellow" : "red"}
                 className="cursor-pointer hover:opacity-80"
               >
                 {accuracy}%
               </Badge>
-            </Link>
+            </DynamicHistoryLink>
           )}
         </div>
       )

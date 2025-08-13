@@ -133,8 +133,8 @@ export function NavUser({
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuItem onSelect={handleLogout} disabled={isLoggingOut}>
-          <LogOut className="mr-2" />
-          <span>{isLoggingOut ? 'Logging out...' : 'Log out'}</span>
+              <LogOut className="" />
+              <span>{isLoggingOut ? 'Logging out...' : 'Log out'}</span>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
