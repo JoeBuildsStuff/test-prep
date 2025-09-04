@@ -62,7 +62,11 @@ export default async function QuestionPage({
     section: question.section?.name || null,
     subsection: question.subsection?.name || null,
     tags: question.tags.map(({ tag }) => tag.name),
-    is_favorited: (question.user_favorites?.length ?? 0) > 0
+    is_favorited: (question.user_favorites?.length ?? 0) > 0,
+    // Parse options if it's a string (fix for JSONB being returned as string)
+    options: typeof question.options === 'string' 
+      ? JSON.parse(question.options) 
+      : question.options
   }
 
   return (

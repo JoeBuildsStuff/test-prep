@@ -1,12 +1,10 @@
 "use client"
 
 import {
-  BadgeCheck,
-  Bell,
   ChevronsUpDown,
-  CreditCard,
   LogOut,
-  Sparkles,
+  Moon,
+  Sun,
 } from "lucide-react"
 
 import {
@@ -17,7 +15,6 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -33,6 +30,7 @@ import {
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/utils/supabase/client'
+import { useTheme } from 'next-themes'
 
 function getInitials(name: string): string {
   return name
@@ -53,7 +51,7 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
-
+  const { setTheme, resolvedTheme } = useTheme()
   const router = useRouter()
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const supabase = createClient()
@@ -110,30 +108,24 @@ export function NavUser({
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <Sparkles />
-                Upgrade to Pro
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCard />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <Bell />
-                Notifications
-              </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}>
+              {resolvedTheme === "dark" ? (
+                <>
+                  <Sun className="h-[1.2rem] w-[1.2rem] mr-2" />
+                  <span>Toggle Light Mode</span>
+                </>
+              ) : (
+                <>
+                  <Moon className="h-[1.2rem] w-[1.2rem] mr-2" />
+                  <span>Toggle Dark Mode</span>
+                </>
+              )}
+              <span className="sr-only">Toggle Theme</span>
+          
+            </DropdownMenuItem>
+
             <DropdownMenuItem onSelect={handleLogout} disabled={isLoggingOut}>
-              <LogOut className="" />
+              <LogOut className="mr-2" />
               <span>{isLoggingOut ? 'Logging out...' : 'Log out'}</span>
             </DropdownMenuItem>
           </DropdownMenuContent>

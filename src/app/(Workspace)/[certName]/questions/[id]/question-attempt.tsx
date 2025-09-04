@@ -49,6 +49,14 @@ export function QuestionAttempt({ question, testId, previousResponse }: Question
     if (selectedAnswer.length === 0) return
     setAttemptError(null)
 
+    // Ensure user is authenticated for RLS policies
+    const { data: authData } = await supabase.auth.getUser()
+    const user = authData?.user
+    if (!user) {
+      setAttemptError('You must be signed in to submit an answer.')
+      return
+    }
+
     let correct = false
     if (question.type === 'MULTIPLE_CHOICE') {
       // Normalize both arrays: convert to uppercase and sort
@@ -89,6 +97,7 @@ export function QuestionAttempt({ question, testId, previousResponse }: Question
         .schema('test_prep')
         .from('user_responses')
         .insert({
+          user_id: user.id,
           question_id: question.id,
           selected_answers: selectedAnswer.map((a: string) => a.toUpperCase()),
           is_correct: correct,
@@ -136,6 +145,14 @@ export function QuestionAttempt({ question, testId, previousResponse }: Question
 
   const handleFavoriteToggle = async () => {
     try {
+      // Ensure user is authenticated for RLS policies
+      const { data: authData } = await supabase.auth.getUser()
+      const user = authData?.user
+      if (!user) {
+        setAttemptError('You must be signed in to manage favorites.')
+        return
+      }
+
       if (isFavorited) {
         // Remove from favorites
         const { error } = await supabase
@@ -143,6 +160,7 @@ export function QuestionAttempt({ question, testId, previousResponse }: Question
           .from('user_favorites')
           .delete()
           .eq('question_id', question.id)
+          .eq('user_id', user.id)
 
         if (error) throw error
         setIsFavorited(false)
@@ -152,6 +170,7 @@ export function QuestionAttempt({ question, testId, previousResponse }: Question
           .schema('test_prep')
           .from('user_favorites')
           .insert({
+            user_id: user.id,
             question_id: question.id
           })
 

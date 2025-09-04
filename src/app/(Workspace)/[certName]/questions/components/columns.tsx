@@ -24,12 +24,21 @@ function FavoriteCell({ row }: { row: Row<Question> }) {
     
     const supabase = createClient()
     try {
+      // Ensure user is authenticated to satisfy RLS
+      const { data: authData } = await supabase.auth.getUser()
+      const user = authData?.user
+      if (!user) {
+        console.error('Must be signed in to manage favorites')
+        return
+      }
+
       if (isFavorited) {
         const { error } = await supabase
           .schema('test_prep')
           .from('user_favorites')
           .delete()
           .eq('question_id', questionId)
+          .eq('user_id', user.id)
 
         if (error) throw error
         setIsFavorited(false)
@@ -38,6 +47,7 @@ function FavoriteCell({ row }: { row: Row<Question> }) {
           .schema('test_prep')
           .from('user_favorites')
           .insert({
+            user_id: user.id,
             question_id: questionId
           })
 

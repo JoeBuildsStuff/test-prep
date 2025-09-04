@@ -12,339 +12,579 @@ export type Database = {
   __InternalSupabase: {
     PostgrestVersion: "12.2.1 (d3f7cba)"
   }
-  test_prep: {
+  ai_transcriber: {
     Tables: {
-      question_tags: {
+      contact_notes: {
         Row: {
+          contact_id: string
           created_at: string | null
-          question_id: string
-          tag_id: number
+          id: string
+          note_id: string
+          user_id: string | null
         }
         Insert: {
+          contact_id: string
           created_at?: string | null
-          question_id: string
-          tag_id: number
-        }
-        Update: {
-          created_at?: string | null
-          question_id?: string
-          tag_id?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "question_tags_question_id_fkey"
-            columns: ["question_id"]
-            isOneToOne: false
-            referencedRelation: "questions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "question_tags_tag_id_fkey"
-            columns: ["tag_id"]
-            isOneToOne: false
-            referencedRelation: "tags"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      questions: {
-        Row: {
-          correctanswer: string | null
-          created_at: string | null
-          explanation: string | null
-          id: string
-          markdown_explanation: string | null
-          options: Json | null
-          question: string | null
-          section_id: number | null
-          subsection_id: number | null
-          title_long: string | null
-          title_short: string | null
-          type: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          correctanswer?: string | null
-          created_at?: string | null
-          explanation?: string | null
-          id: string
-          markdown_explanation?: string | null
-          options?: Json | null
-          question?: string | null
-          section_id?: number | null
-          subsection_id?: number | null
-          title_long?: string | null
-          title_short?: string | null
-          type?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          correctanswer?: string | null
-          created_at?: string | null
-          explanation?: string | null
           id?: string
-          markdown_explanation?: string | null
-          options?: Json | null
-          question?: string | null
-          section_id?: number | null
-          subsection_id?: number | null
-          title_long?: string | null
-          title_short?: string | null
-          type?: string | null
-          updated_at?: string | null
+          note_id: string
+          user_id?: string | null
+        }
+        Update: {
+          contact_id?: string
+          created_at?: string | null
+          id?: string
+          note_id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "questions_section_id_fkey"
-            columns: ["section_id"]
+            foreignKeyName: "contact_notes_contact_id_fkey"
+            columns: ["contact_id"]
             isOneToOne: false
-            referencedRelation: "sections"
+            referencedRelation: "new_contacts"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "questions_subsection_id_fkey"
-            columns: ["subsection_id"]
+            foreignKeyName: "contact_notes_note_id_fkey"
+            columns: ["note_id"]
             isOneToOne: false
-            referencedRelation: "subsections"
+            referencedRelation: "notes"
             referencedColumns: ["id"]
           },
         ]
       }
-      sections: {
+      contacts: {
         Row: {
+          company: string | null
           created_at: string | null
-          description: string | null
-          id: number
-          name: string | null
+          display_name: string | null
+          first_name: string | null
+          id: string
+          job_title: string | null
+          last_name: string | null
+          notes: string | null
+          primary_email: string | null
+          primary_phone: string | null
           updated_at: string | null
+          user_id: string | null
         }
         Insert: {
+          company?: string | null
           created_at?: string | null
-          description?: string | null
-          id: number
-          name?: string | null
+          display_name?: string | null
+          first_name?: string | null
+          id?: string
+          job_title?: string | null
+          last_name?: string | null
+          notes?: string | null
+          primary_email?: string | null
+          primary_phone?: string | null
           updated_at?: string | null
+          user_id?: string | null
         }
         Update: {
+          company?: string | null
           created_at?: string | null
-          description?: string | null
-          id?: number
-          name?: string | null
+          display_name?: string | null
+          first_name?: string | null
+          id?: string
+          job_title?: string | null
+          last_name?: string | null
+          notes?: string | null
+          primary_email?: string | null
+          primary_phone?: string | null
           updated_at?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
-      subsections: {
+      meeting_attendees: {
         Row: {
-          count: string | null
+          attendance_status: string | null
+          contact_id: string
           created_at: string | null
-          description: string | null
-          id: number
-          name: string | null
-          section_id: number | null
+          id: string
+          invitation_status: string | null
+          invited_at: string | null
+          meeting_id: string
+          notes: string | null
+          responded_at: string | null
+          role: string | null
           updated_at: string | null
+          user_id: string
         }
         Insert: {
-          count?: string | null
+          attendance_status?: string | null
+          contact_id: string
           created_at?: string | null
-          description?: string | null
-          id: number
-          name?: string | null
-          section_id?: number | null
+          id?: string
+          invitation_status?: string | null
+          invited_at?: string | null
+          meeting_id: string
+          notes?: string | null
+          responded_at?: string | null
+          role?: string | null
           updated_at?: string | null
+          user_id?: string
         }
         Update: {
-          count?: string | null
+          attendance_status?: string | null
+          contact_id?: string
           created_at?: string | null
-          description?: string | null
-          id?: number
-          name?: string | null
-          section_id?: number | null
+          id?: string
+          invitation_status?: string | null
+          invited_at?: string | null
+          meeting_id?: string
+          notes?: string | null
+          responded_at?: string | null
+          role?: string | null
           updated_at?: string | null
+          user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "subsections_section_id_fkey"
-            columns: ["section_id"]
+            foreignKeyName: "meeting_attendees_contact_id_fkey"
+            columns: ["contact_id"]
             isOneToOne: false
-            referencedRelation: "sections"
+            referencedRelation: "new_contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meeting_attendees_meeting_id_fkey"
+            columns: ["meeting_id"]
+            isOneToOne: false
+            referencedRelation: "meetings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meeting_attendees_meeting_id_fkey"
+            columns: ["meeting_id"]
+            isOneToOne: false
+            referencedRelation: "meetings_with_attendee_summary"
             referencedColumns: ["id"]
           },
         ]
       }
-      tags: {
+      meeting_notes: {
         Row: {
-          count: string | null
           created_at: string | null
-          id: number
-          name: string | null
-          type: string | null
+          id: string
+          meeting_id: string
+          note_id: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          meeting_id: string
+          note_id: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          meeting_id?: string
+          note_id?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meeting_notes_meeting_id_fkey"
+            columns: ["meeting_id"]
+            isOneToOne: false
+            referencedRelation: "meetings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meeting_notes_meeting_id_fkey"
+            columns: ["meeting_id"]
+            isOneToOne: false
+            referencedRelation: "meetings_with_attendee_summary"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meeting_notes_note_id_fkey"
+            columns: ["note_id"]
+            isOneToOne: false
+            referencedRelation: "notes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meeting_speakers: {
+        Row: {
+          confidence_score: number | null
+          contact_id: string | null
+          created_at: string | null
+          id: string
+          identified_at: string | null
+          is_primary_speaker: boolean | null
+          meeting_id: string
+          role: string | null
+          speaker_index: number
+          speaker_name: string | null
           updated_at: string | null
         }
         Insert: {
-          count?: string | null
+          confidence_score?: number | null
+          contact_id?: string | null
           created_at?: string | null
-          id: number
-          name?: string | null
-          type?: string | null
+          id?: string
+          identified_at?: string | null
+          is_primary_speaker?: boolean | null
+          meeting_id: string
+          role?: string | null
+          speaker_index: number
+          speaker_name?: string | null
           updated_at?: string | null
         }
         Update: {
-          count?: string | null
+          confidence_score?: number | null
+          contact_id?: string | null
           created_at?: string | null
-          id?: number
-          name?: string | null
-          type?: string | null
+          id?: string
+          identified_at?: string | null
+          is_primary_speaker?: boolean | null
+          meeting_id?: string
+          role?: string | null
+          speaker_index?: number
+          speaker_name?: string | null
           updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meeting_speakers_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "new_contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meeting_speakers_meeting_id_fkey"
+            columns: ["meeting_id"]
+            isOneToOne: false
+            referencedRelation: "meetings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meeting_speakers_meeting_id_fkey"
+            columns: ["meeting_id"]
+            isOneToOne: false
+            referencedRelation: "meetings_with_attendee_summary"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meetings: {
+        Row: {
+          audio_file_path: string | null
+          created_at: string | null
+          formatted_transcript: Json | null
+          id: string
+          meeting_at: string | null
+          meeting_reviewed: boolean | null
+          openai_response: Json | null
+          original_file_name: string | null
+          speaker_names: Json | null
+          summary: string | null
+          summary_jsonb: Json | null
+          title: string | null
+          transcription: Json | null
+          updated_at: string | null
+          user_id: string | null
+          user_notes: string | null
+        }
+        Insert: {
+          audio_file_path?: string | null
+          created_at?: string | null
+          formatted_transcript?: Json | null
+          id?: string
+          meeting_at?: string | null
+          meeting_reviewed?: boolean | null
+          openai_response?: Json | null
+          original_file_name?: string | null
+          speaker_names?: Json | null
+          summary?: string | null
+          summary_jsonb?: Json | null
+          title?: string | null
+          transcription?: Json | null
+          updated_at?: string | null
+          user_id?: string | null
+          user_notes?: string | null
+        }
+        Update: {
+          audio_file_path?: string | null
+          created_at?: string | null
+          formatted_transcript?: Json | null
+          id?: string
+          meeting_at?: string | null
+          meeting_reviewed?: boolean | null
+          openai_response?: Json | null
+          original_file_name?: string | null
+          speaker_names?: Json | null
+          summary?: string | null
+          summary_jsonb?: Json | null
+          title?: string | null
+          transcription?: Json | null
+          updated_at?: string | null
+          user_id?: string | null
+          user_notes?: string | null
         }
         Relationships: []
       }
-      test_questions: {
+      new_companies: {
         Row: {
           created_at: string | null
+          description: string | null
           id: string
-          order: number | null
-          question_id: string | null
-          test_id: string | null
+          name: string
+          user_id: string | null
         }
         Insert: {
           created_at?: string | null
-          id: string
-          order?: number | null
-          question_id?: string | null
-          test_id?: string | null
+          description?: string | null
+          id?: string
+          name: string
+          user_id?: string | null
         }
         Update: {
           created_at?: string | null
+          description?: string | null
           id?: string
-          order?: number | null
-          question_id?: string | null
-          test_id?: string | null
+          name?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      new_contact_emails: {
+        Row: {
+          contact_id: string | null
+          created_at: string | null
+          display_order: number | null
+          email: string
+          id: string
+          user_id: string | null
+        }
+        Insert: {
+          contact_id?: string | null
+          created_at?: string | null
+          display_order?: number | null
+          email: string
+          id?: string
+          user_id?: string | null
+        }
+        Update: {
+          contact_id?: string | null
+          created_at?: string | null
+          display_order?: number | null
+          email?: string
+          id?: string
+          user_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "test_questions_question_id_fkey"
-            columns: ["question_id"]
+            foreignKeyName: "new_contact_emails_contact_id_fkey"
+            columns: ["contact_id"]
             isOneToOne: false
-            referencedRelation: "questions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "test_questions_test_id_fkey"
-            columns: ["test_id"]
-            isOneToOne: false
-            referencedRelation: "tests"
+            referencedRelation: "new_contacts"
             referencedColumns: ["id"]
           },
         ]
       }
-      tests: {
+      new_contact_phones: {
         Row: {
-          attempt_num: number | null
-          completed_at: string | null
+          contact_id: string | null
+          created_at: string | null
+          display_order: number | null
+          id: string
+          phone: string
+          user_id: string | null
+        }
+        Insert: {
+          contact_id?: string | null
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          phone: string
+          user_id?: string | null
+        }
+        Update: {
+          contact_id?: string | null
+          created_at?: string | null
+          display_order?: number | null
+          id?: string
+          phone?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "new_contact_phones_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "new_contacts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      new_contacts: {
+        Row: {
+          city: string | null
+          company_id: string | null
+          created_at: string | null
+          description: string | null
+          first_name: string | null
+          id: string
+          is_favorite: boolean | null
+          job_title: string | null
+          last_name: string | null
+          linkedin: string | null
+          state: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          city?: string | null
+          company_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          first_name?: string | null
+          id?: string
+          is_favorite?: boolean | null
+          job_title?: string | null
+          last_name?: string | null
+          linkedin?: string | null
+          state?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          city?: string | null
+          company_id?: string | null
+          created_at?: string | null
+          description?: string | null
+          first_name?: string | null
+          id?: string
+          is_favorite?: boolean | null
+          job_title?: string | null
+          last_name?: string | null
+          linkedin?: string | null
+          state?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "new_contacts_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "new_companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notes: {
+        Row: {
+          content: string | null
           created_at: string | null
           id: string
-          score: number | null
+          title: string | null
+          updated_at: string | null
           user_id: string
         }
         Insert: {
-          attempt_num?: number | null
-          completed_at?: string | null
+          content?: string | null
           created_at?: string | null
           id?: string
-          score?: number | null
-          user_id: string
+          title?: string | null
+          updated_at?: string | null
+          user_id?: string
         }
         Update: {
-          attempt_num?: number | null
-          completed_at?: string | null
+          content?: string | null
           created_at?: string | null
           id?: string
-          score?: number | null
+          title?: string | null
+          updated_at?: string | null
           user_id?: string
         }
         Relationships: []
       }
-      user_favorites: {
-        Row: {
-          created_at: string | null
-          id: string
-          question_id: string | null
-          user_id: string | null
-        }
-        Insert: {
-          created_at?: string | null
-          id: string
-          question_id?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          created_at?: string | null
-          id?: string
-          question_id?: string | null
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_favorites_question_id_fkey"
-            columns: ["question_id"]
-            isOneToOne: false
-            referencedRelation: "questions"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      user_responses: {
-        Row: {
-          attempt_number: number | null
-          created_at: string | null
-          id: string
-          is_correct: boolean | null
-          question_id: string | null
-          selected_answers: Json | null
-          test_id: string | null
-          user_id: string | null
-        }
-        Insert: {
-          attempt_number?: number | null
-          created_at?: string | null
-          id: string
-          is_correct?: boolean | null
-          question_id?: string | null
-          selected_answers?: Json | null
-          test_id?: string | null
-          user_id?: string | null
-        }
-        Update: {
-          attempt_number?: number | null
-          created_at?: string | null
-          id?: string
-          is_correct?: boolean | null
-          question_id?: string | null
-          selected_answers?: Json | null
-          test_id?: string | null
-          user_id?: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "user_responses_question_id_fkey"
-            columns: ["question_id"]
-            isOneToOne: false
-            referencedRelation: "questions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "user_responses_test_id_fkey"
-            columns: ["test_id"]
-            isOneToOne: false
-            referencedRelation: "tests"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
     }
     Views: {
-      [_ in never]: never
+      meeting_attendees_with_contacts: {
+        Row: {
+          attendance_status: string | null
+          company: string | null
+          contact_id: string | null
+          created_at: string | null
+          display_name: string | null
+          first_name: string | null
+          id: string | null
+          invitation_status: string | null
+          invited_at: string | null
+          job_title: string | null
+          last_name: string | null
+          meeting_id: string | null
+          notes: string | null
+          primary_email: string | null
+          primary_phone: string | null
+          responded_at: string | null
+          role: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meeting_attendees_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "new_contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meeting_attendees_meeting_id_fkey"
+            columns: ["meeting_id"]
+            isOneToOne: false
+            referencedRelation: "meetings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "meeting_attendees_meeting_id_fkey"
+            columns: ["meeting_id"]
+            isOneToOne: false
+            referencedRelation: "meetings_with_attendee_summary"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meetings_with_attendee_summary: {
+        Row: {
+          absent_count: number | null
+          accepted_count: number | null
+          audio_file_path: string | null
+          created_at: string | null
+          declined_count: number | null
+          formatted_transcript: Json | null
+          id: string | null
+          meeting_at: string | null
+          meeting_reviewed: boolean | null
+          no_response_count: number | null
+          openai_response: Json | null
+          original_file_name: string | null
+          present_count: number | null
+          speaker_names: Json | null
+          summary: string | null
+          summary_jsonb: Json | null
+          tentative_count: number | null
+          title: string | null
+          total_invited: number | null
+          transcription: Json | null
+          updated_at: string | null
+          user_id: string | null
+          user_notes: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never
@@ -476,7 +716,7 @@ export type CompositeTypes<
     : never
 
 export const Constants = {
-  test_prep: {
+  ai_transcriber: {
     Enums: {},
   },
 } as const
