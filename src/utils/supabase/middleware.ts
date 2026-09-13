@@ -45,10 +45,16 @@ export async function updateSession(request: NextRequest) {
     !request.nextUrl.pathname.startsWith('/login') &&
     !request.nextUrl.pathname.startsWith('/auth')
   ) {
-    // no user, potentially respond by redirecting the user to the login page
-    const url = request.nextUrl.clone()
-    url.pathname = '/login'
-    return NextResponse.redirect(url)
+    const { error } = await supabase.auth.signInAnonymously()
+    if (error) {
+      console.error('Anonymous sign-in failed:', error.message)
+      const url = request.nextUrl.clone()
+      url.pathname = '/login'
+      return NextResponse.redirect(url)
+    }
+
+    // Keep the session cookies from signInAnonymously on the forwarded request.
+    return supabaseResponse
   }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is.

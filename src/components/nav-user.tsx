@@ -5,6 +5,7 @@ import {
   LogOut,
   Moon,
   Sun,
+  UserPlus,
 } from "lucide-react"
 
 import {
@@ -43,12 +44,14 @@ function getInitials(name: string): string {
 
 export function NavUser({
   user,
+  isAnonymous = false,
 }: {
   user: {
     name: string
     email: string
     avatar: string
   }
+  isAnonymous?: boolean
 }) {
   const { isMobile } = useSidebar()
   const { setTheme, resolvedTheme } = useTheme()
@@ -108,6 +111,12 @@ export function NavUser({
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
+            {isAnonymous && (
+              <DropdownMenuItem onSelect={() => router.push('/login')}>
+                <UserPlus className="mr-2" />
+                <span>Create Account</span>
+              </DropdownMenuItem>
+            )}
             <DropdownMenuItem onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}>
               {resolvedTheme === "dark" ? (
                 <>

@@ -3,19 +3,25 @@
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { usePathname } from 'next/navigation'
+import { isCertSlug } from '@/lib/certifications'
 
 export function NewTestButton() {
     const pathname = usePathname()
-    
-    if (pathname === '/workspace/tests/new') {
+    const certSlug = pathname.split('/').filter(Boolean)[0]
+
+    if (!isCertSlug(certSlug)) {
+        return null
+    }
+
+    if (pathname === `/${certSlug}/tests/new`) {
         return null
     }
 
     return (
-        <Link href="/workspace/tests/new">
-            <Button size="sm" variant="secondary">
+        <Button asChild size="sm" variant="secondary">
+            <Link href={`/${certSlug}/tests/new`}>
                 New Test
-            </Button>
-        </Link>
+            </Link>
+        </Button>
     )
 }
