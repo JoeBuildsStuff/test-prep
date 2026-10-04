@@ -1,17 +1,26 @@
 import { signInWithMagicLink, signInWithGoogle, signInWithGithub } from '@/actions/auth';
+import { createClient } from '@/utils/supabase/server';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
-const LoginPage = () => {
+const LoginPage = async () => {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  const isAnonymous = user?.is_anonymous ?? false
+
   return (
     <div className="min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Welcome back!</CardTitle>
+          <CardTitle className="text-2xl font-bold text-center">
+            {isAnonymous ? 'Create Your Account' : 'Welcome back!'}
+          </CardTitle>
           <CardDescription className="text-center">
-            Enter your email to sign in to your account
+            {isAnonymous
+              ? 'Save your progress and access it from any device'
+              : 'Enter your email to sign in to your account'}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

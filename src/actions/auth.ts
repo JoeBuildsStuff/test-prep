@@ -6,18 +6,21 @@ import { z } from 'zod'
 
 import { createClient } from '@/utils/supabase/server'
 
-// Update schema to only include email
 const authSchema = z.object({
   email: z.string().email(),
 })
 
-// Replace login and signup with a single magic link function
+async function isCurrentUserAnonymous(): Promise<boolean> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  return user?.is_anonymous ?? false
+}
+
 export async function signInWithMagicLink(formData: FormData) {
   'use server'
   
   const supabase = await createClient()
 
-  // Parse and validate the email
   const result = authSchema.safeParse({
     email: formData.get('email'),
   })
@@ -27,6 +30,22 @@ export async function signInWithMagicLink(formData: FormData) {
     redirect('/error')
   }
 
+  const anonymous = await isCurrentUserAnonymous()
+
+  if (anonymous) {
+    const { error } = await supabase.auth.updateUser({
+      email: result.data.email,
+    })
+
+    if (error) {
+      console.log("link-email-error", error)
+      redirect('/error')
+    }
+
+    revalidatePath('/', 'layout')
+    redirect('/verify-email')
+  }
+
   const { error } = await supabase.auth.signInWithOtp({
     email: result.data.email,
     options: {
@@ -34,8 +53,6 @@ export async function signInWithMagicLink(formData: FormData) {
       emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}`,
     },
   })
-
-  console.log("emailRedirectTo: ", `${process.env.NEXT_PUBLIC_SITE_URL}`)
 
   if (error) {
     console.log("magic-link-error", error)
@@ -50,7 +67,29 @@ export async function signInWithGoogle() {
   'use server'
 
   const supabase = await createClient()
-  
+  const anonymous = await isCurrentUserAnonymous()
+
+  if (anonymous) {
+    const { data, error } = await supabase.auth.linkIdentity({
+      provider: 'google',
+      options: {
+        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
+      }
+    })
+
+    if (error) {
+      console.log("link-google-error", error)
+      redirect('/error')
+    }
+
+    if (data.url) {
+      redirect(data.url)
+    }
+
+    revalidatePath('/', 'layout')
+    return
+  }
+
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
@@ -74,7 +113,29 @@ export async function signInWithGithub() {
   'use server'
   
   const supabase = await createClient()
-  
+  const anonymous = await isCurrentUserAnonymous()
+
+  if (anonymous) {
+    const { data, error } = await supabase.auth.linkIdentity({
+      provider: 'github',
+      options: {
+        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/auth/callback`
+      }
+    })
+
+    if (error) {
+      console.log("link-github-error", error)
+      redirect('/error')
+    }
+
+    if (data.url) {
+      redirect(data.url)
+    }
+
+    revalidatePath('/', 'layout')
+    return
+  }
+
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'github',
     options: {
